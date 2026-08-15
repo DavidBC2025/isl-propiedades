@@ -11,7 +11,7 @@ export default async function Home() {
       <div className="max-w-4xl mx-auto">
         <h1 className="text-4xl font-bold text-center mb-4 text-blue-900">ISL Propiedades</h1>
         <p className="text-center mb-12 text-gray-600">
-          Encuentra tu hogar ideal en Viña del Mar y alrededores.
+          Encuentra tu hogar ideal en Viña del Mar y alrededores..
         </p>
         
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
