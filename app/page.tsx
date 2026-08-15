@@ -3,7 +3,8 @@ import { supabase } from '../lib/supabase'
 export const dynamic = 'force-dynamic'
 
 export default async function Home() {
-  const { data: propiedades } = await supabase
+  // Intentamos la consulta de manera protegida
+  const { data: propiedades, error } = await supabase
     .from('propiedades')
     .select('*')
 
@@ -14,6 +15,12 @@ export default async function Home() {
         <p className="text-center mb-12 text-gray-600">
           Encuentra tu hogar ideal en Viña del Mar y alrededores.
         </p>
+
+        {error && (
+          <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-6 text-center">
+            Error al conectar con la base de datos. Verifica las credenciales en Cloudflare.
+          </div>
+        )}
         
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           {propiedades?.map((propiedad) => (
