@@ -1,9 +1,12 @@
-import { supabase } from '../lib/supabase'
+import { createClient } from '@supabase/supabase-js'
 
 export const dynamic = 'force-dynamic'
 
 export default async function Home() {
-  // Intentamos la consulta de manera protegida
+  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || ''
+  const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || ''
+  const supabase = createClient(supabaseUrl, supabaseAnonKey)
+
   const { data: propiedades, error } = await supabase
     .from('propiedades')
     .select('*')
@@ -18,7 +21,7 @@ export default async function Home() {
 
         {error && (
           <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-6 text-center">
-            Error al conectar con la base de datos. Verifica las credenciales en Cloudflare.
+            Error al conectar con la base de datos.
           </div>
         )}
         
