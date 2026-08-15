@@ -1,7 +1,8 @@
 import { supabase } from '../lib/supabase'
 
+export const dynamic = 'force-dynamic'
+
 export default async function Home() {
-  // 1. Le pedimos a Supabase que traiga toda la información de la tabla "propiedades"
   const { data: propiedades } = await supabase
     .from('propiedades')
     .select('*')
@@ -11,7 +12,7 @@ export default async function Home() {
       <div className="max-w-4xl mx-auto">
         <h1 className="text-4xl font-bold text-center mb-4 text-blue-900">ISL Propiedades</h1>
         <p className="text-center mb-12 text-gray-600">
-          Encuentra tu hogar ideal en Viña del Mar y alrededores..
+          Encuentra tu hogar ideal en Viña del Mar y alrededores.
         </p>
         
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -27,7 +28,7 @@ export default async function Home() {
               
               <div className="flex justify-between items-center pt-4 border-t border-gray-100">
                 <span className="text-2xl font-bold text-blue-600">
-                  ${propiedad.precio.toLocaleString('es-CL')}
+                  ${propiedad.precio?.toLocaleString('es-CL')}
                 </span>
                 <div className="text-sm text-gray-500 font-medium">
                   {propiedad.tipo} • {propiedad.habitaciones} Hab. • {propiedad.banos} Baños
