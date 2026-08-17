@@ -8,13 +8,15 @@ export default async function Home() {
   const supabase = createClient(supabaseUrl, supabaseAnonKey)
 
   const { data: propiedades, error } = await supabase
-    .from('propiedades')
+    .from('Propiedades')
     .select('*')
 
   return (
     <main className="min-h-screen p-8 bg-gray-50 text-gray-900">
       <div className="max-w-4xl mx-auto">
-        <h1 className="text-4xl font-bold text-center mb-4 text-blue-900">ISL Propiedades</h1>
+        <h1 className="text-4xl font-bold text-center mb-4 text-blue-900">
+          ISL Propiedades
+        </h1>
         <p className="text-center mb-12 text-gray-600">
           Encuentra tu hogar ideal en Viña del Mar y alrededores.
         </p>
@@ -24,24 +26,40 @@ export default async function Home() {
             Error al conectar con la base de datos.
           </div>
         )}
-        
+
+        {!error && (!propiedades || propiedades.length === 0) && (
+          <div className="bg-yellow-50 border border-yellow-200 text-yellow-800 px-4 py-3 rounded mb-6 text-center">
+            No hay propiedades publicadas todavía.
+          </div>
+        )}
+
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          {propiedades?.map((propiedad) => (
-            <div key={propiedad.id} className="bg-white p-6 rounded-xl shadow border border-gray-200">
+          {propiedades?.map((propiedad: any) => (
+            <div
+              key={propiedad.id || propiedad.titulo}
+              className="bg-white p-6 rounded-xl shadow border border-gray-200"
+            >
               <div className="flex justify-between items-start mb-4">
                 <h2 className="text-xl font-bold">{propiedad.titulo}</h2>
-                <span className="bg-blue-100 text-blue-800 text-xs font-bold px-3 py-1 rounded-full uppercase tracking-wider">
-                  {propiedad.operacion}
-                </span>
+                {propiedad.operacion && (
+                  <span className="bg-blue-100 text-blue-800 text-xs font-bold px-3 py-1 rounded-full uppercase tracking-wider">
+                    {propiedad.operacion}
+                  </span>
+                )}
               </div>
+
               <p className="text-gray-600 mb-6">{propiedad.descripcion}</p>
-              
+
               <div className="flex justify-between items-center pt-4 border-t border-gray-100">
                 <span className="text-2xl font-bold text-blue-600">
-                  ${propiedad.precio?.toLocaleString('es-CL')}
+                  {propiedad.precio
+                    ? `$${Number(propiedad.precio).toLocaleString('es-CL')}`
+                    : 'Consultar'}
                 </span>
                 <div className="text-sm text-gray-500 font-medium">
-                  {propiedad.tipo} • {propiedad.habitaciones} Hab. • {propiedad.banos} Baños
+                  {propiedad.tipo || 'Propiedad'}
+                  {propiedad.habitaciones ? ` • ${propiedad.habitaciones} Hab.` : ''}
+                  {propiedad.banos ? ` • ${propiedad.banos} Baños` : ''}
                 </div>
               </div>
             </div>
