@@ -135,7 +135,7 @@ la migración. La migración es aditiva y no se ejecuta desde la aplicación.
 ## Plan de la serie de 15 prompts
 
 1. Auditoría y datos — **completado**
-2. Sistema de diseño
+2. Sistema de diseño — **completado**
 3. Motor de fotos y video
 4. Componentes de contenido y datos
 5. Home
@@ -149,3 +149,17 @@ la migración. La migración es aditiva y no se ejecuta desde la aplicación.
 13. Admin: consultas y ajustes
 14. Páginas comerciales y barrios públicos
 15. Guía pública, calculadora y SEO final
+
+## Prompt 2 — Sistema de diseño
+
+Se creó la base visual ISL sin modificar la página de catálogo ni la integración
+con Supabase. `app/globals.css` incorpora la paleta ISL, tokens de Tailwind,
+tipografías globales, utilidades de sección, overlay, estados de carga de medios,
+foco visible y animaciones que respetan `prefers-reduced-motion`. El layout raíz
+usa Cormorant Garamond para titulares e Inter para UI mediante `next/font/google`,
+además de metadata en español.
+
+Se añadieron `Container`, `SectionTitle`, `ButtonISL`, `PriceTag` y `EmptyState`
+en `components/isl/`, más los límites de carga y error globales. `PriceTag`
+presenta precios solo como UF con separador chileno. El dorado `#C6A87C` sobre
+negro `#0A0A0A` tiene contraste aproximado 9.29:1, superior a WCAG AA para texto.

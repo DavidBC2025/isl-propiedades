@@ -1,26 +1,96 @@
 @import "tailwindcss";
 
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  --isl-black: #0A0A0A;
+  --isl-white: #FFFFFF;
+  --isl-offwhite: #F7F7F5;
+  --isl-gray: #A1A1AA;
+  --isl-gold: #C6A87C;
+  --isl-champagne: #E8DCC8;
 }
 
 @theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+  --color-isl-black: var(--isl-black);
+  --color-isl-white: var(--isl-white);
+  --color-isl-offwhite: var(--isl-offwhite);
+  --color-isl-gray: var(--isl-gray);
+  --color-isl-gold: var(--isl-gold);
+  --color-isl-champagne: var(--isl-champagne);
+  --font-sans: var(--font-isl-sans);
+  --font-serif: var(--font-isl-serif);
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+* {
+  border-color: color-mix(in srgb, var(--isl-black) 12%, transparent);
+}
+
+html {
+  background: var(--isl-white);
 }
 
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  min-height: 100%;
+  background: var(--isl-white);
+  color: var(--isl-black);
+  font-family: var(--font-isl-sans), Arial, Helvetica, sans-serif;
+  font-weight: 400;
+}
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  font-family: var(--font-isl-serif), Georgia, serif;
+}
+
+button,
+a {
+  -webkit-tap-highlight-color: transparent;
+}
+
+:focus-visible {
+  outline: 2px solid var(--isl-gold);
+  outline-offset: 3px;
+}
+
+.isl-hero-overlay {
+  background: linear-gradient(180deg, rgba(0, 0, 0, 0.4) 0%, rgba(0, 0, 0, 0.2) 50%, rgba(0, 0, 0, 0.6) 100%);
+}
+
+.isl-section {
+  padding-block: 5rem;
+}
+
+.isl-upload-zone {
+  border: 1px dashed var(--isl-gray);
+  border-radius: 0.25rem;
+  background: var(--isl-offwhite);
+  transition: border-color 200ms ease, background-color 200ms ease;
+}
+
+.isl-upload-zone:hover,
+.isl-upload-zone[data-dragging="true"] {
+  border-color: var(--isl-gold);
+  background: var(--isl-white);
+}
+
+@keyframes isl-kenburns {
+  from { transform: scale(1); }
+  to { transform: scale(1.06); }
+}
+
+@keyframes isl-fade-up {
+  from { opacity: 0; transform: translateY(1rem); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@media (min-width: 768px) {
+  .isl-section { padding-block: 8rem; }
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .isl-kenburns { animation: isl-kenburns 18s ease-out both; }
+  .isl-fade-up { animation: isl-fade-up 600ms ease-out both; }
 }
