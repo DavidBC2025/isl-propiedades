@@ -136,7 +136,7 @@ la migración. La migración es aditiva y no se ejecuta desde la aplicación.
 
 1. Auditoría y datos — **completado**
 2. Sistema de diseño — **completado**
-3. Motor de fotos y video
+3. Motor de fotos y video — **completado**
 4. Componentes de contenido y datos
 5. Home
 6. Catálogo y comparador
@@ -163,3 +163,19 @@ Se añadieron `Container`, `SectionTitle`, `ButtonISL`, `PriceTag` y `EmptyState
 en `components/isl/`, más los límites de carga y error globales. `PriceTag`
 presenta precios solo como UF con separador chileno. El dorado `#C6A87C` sobre
 negro `#0A0A0A` tiene contraste aproximado 9.29:1, superior a WCAG AA para texto.
+
+## Prompt 3 — Motor de fotos y video
+
+Se añadieron `lib/media.ts` y `lib/whatsapp.ts` como fuentes únicas para
+interpretar videos y construir enlaces de WhatsApp. `lib/image-client.ts` procesa
+fotos solo en el navegador: intenta convertir HEIC a JPEG con `heic2any`, limita
+el lado mayor a 2000 px, comprime a WebP/JPEG y genera una miniatura de 400 px.
+Si HEIC no se puede convertir, el flujo sigue y muestra una orientación simple
+para configurar el iPhone en modo Más compatible.
+
+`MediaUploader` centraliza fotos individuales/múltiples, video, PDF, cámara móvil,
+orden y portada de fotos, alternativa YouTube/Vimeo, aviso operativo de 50 MB,
+indicador de actividad y subida a Supabase Storage. Sus miniaturas se guardan en
+la carpeta `thumbnails` bajo el mismo prefijo. `HeroMedia` usa `parseVideoUrl`,
+incluye video directo o embed, overlay, fallback y Ken Burns de 8 segundos que
+respeta `prefers-reduced-motion`. Se instaló únicamente `heic2any`.
