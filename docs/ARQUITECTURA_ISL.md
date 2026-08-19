@@ -142,7 +142,7 @@ la migración. La migración es aditiva y no se ejecuta desde la aplicación.
 6. Catálogo y comparador — **completado**
 7. Leads y notificaciones — **completado**
 8. Ficha de propiedad — **completado**
-9. Admin: estructura y panel
+9. Admin: estructura y panel — **completado**
 10. Admin: propiedades
 11. Admin: hero y agentes
 12. Admin: barrios, guía y testimonios
@@ -295,6 +295,35 @@ quedan en la página, con relleno de las más recientes.
 SEO: `generateMetadata` con title absoluto, description ~155, OG de portada y
 canonical. JSON-LD `RealEstateListing` (sin precio CLP) y `BreadcrumbList`.
 `NEXT_PUBLIC_SITE_URL` es la base canónica; si falta, se usa un placeholder.
+
+## Prompt 9 — Admin: estructura y panel
+
+Auth con `@supabase/ssr` (ya instalado). `proxy.ts` (convención de Next 16;
+equivale al middleware pedido) cubre `/admin` y `/admin/*`: sin sesión redirige a `/admin/login`; con sesión en login, al panel.
+`getUser()` (no `getSession()`) confirma la identidad. Login con correo y clave
+(`signInWithPassword`). No hay registro público. Crear las cuentas de Silvia e
+Ivannia en Authentication de Supabase.
+
+Rutas:
+
+| Ruta | Rol |
+| --- | --- |
+| `/admin/login` | Entrada. Sin menú. |
+| `/admin` | Panel: tarjetas, primeros pasos y accesos rápidos. |
+| `/admin/propiedades` | Listado (formulario de alta: Prompt 10). |
+| `/admin/propiedades/nueva` | Placeholder hasta el Prompt 10. |
+| `/admin/leads` | Listado de consultas. |
+| `/admin/hero`, `/agentes`, `/barrios`, `/guia`, `/testimonios`, `/ajustes` | Placeholder hasta Prompts 11–13. |
+
+El menú (colapsable en móvil) usa esas etiquetas. Consultas muestra un número si
+hay estado `nuevo`. «Ver el sitio» abre la home en otra pestaña. Saludo con el
+nombre de la sesión si existe; si no, «Hola».
+
+Primeros pasos se calcula solo con datos reales (perfil de agente, WhatsApp +
+titular, propiedad publicada con fotos, destacado, barrio publicado). Si las
+tablas están vacías o fallan, todo queda pendiente y no se rompe. Se oculta al
+cumplir los 5 o al minimizar a mano (`isl:admin:primeros-pasos-oculto`).
+
 
 
 

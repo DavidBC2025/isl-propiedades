@@ -22,6 +22,9 @@ pueda administrar el proyecto de Supabase.
    borrador y la configuración inicial; no agrega propiedades ni contenido falso.
 8. Confirma el límite de archivos configurado en los buckets. El script fija 50
    MB solo al crear buckets nuevos; si ya existían, conserva su límite actual.
+9. En **Authentication → Users**, crea las cuentas de Silvia e Ivannia (correo y
+   clave). El panel `/admin` no tiene registro público: solo pueden entrar esas
+   cuentas.
 
 ## Validación rápida de permisos
 

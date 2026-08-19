@@ -113,6 +113,12 @@ Ritmo: galería → encabezado UF → acciones → descripción → característ
 mapa OSM o dirección → agente → visita (o aviso de vendida). Lightbox sin
 auto-rotación. PDF solo en el cliente. Sin cifras de visitas ni urgencia falsa.
 
+## Administración
+
+Copy sin jerga. Menú: Panel, Propiedades, Hero, Agentes, Barrios, Guía,
+Testimonios, Consultas, Ajustes. Vacío: `EmptyState` y un botón para crear.
+Confirmaciones breves en cada acción que grabe datos (desde Prompt 10).
+
 ## Continuidad
 
 `docs/ARQUITECTURA_ISL.md` y `docs/DESIGN.md` se actualizan en cada prompt siguiente de la serie: se les agrega lo nuevo, no se reescriben desde cero.
