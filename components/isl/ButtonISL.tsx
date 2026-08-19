@@ -10,6 +10,7 @@ type ButtonISLProps = {
   href?: string;
   type?: ButtonHTMLAttributes<HTMLButtonElement>["type"];
   onClick?: ButtonHTMLAttributes<HTMLButtonElement>["onClick"];
+  disabled?: boolean;
   children: ReactNode;
   className?: string;
   "aria-label"?: string;
@@ -35,6 +36,7 @@ export function ButtonISL({
   href,
   type = "button",
   onClick,
+  disabled,
   children,
   className,
   "aria-label": ariaLabel,
@@ -43,12 +45,21 @@ export function ButtonISL({
     "inline-flex items-center justify-center rounded-sm font-sans font-medium uppercase tracking-[0.12em] transition duration-300 motion-safe:hover:-translate-y-0.5",
     variantClasses[variant],
     sizeClasses[size],
+    disabled ? "pointer-events-none opacity-50" : "",
     className,
   ].filter(Boolean).join(" ");
 
   if (href) {
-    return <Link href={href} className={classes} aria-label={ariaLabel}>{children}</Link>;
+    if (/^https?:\/\//i.test(href) || href.startsWith("mailto:")) {
+      const external = href.startsWith("http");
+      return (
+        <a href={href} className={classes} aria-label={ariaLabel} {...(external ? { target: "_blank", rel: "noreferrer" } : {})}>
+          {children}
+        </a>
+      );
+    }
+    return <Link href={href} className={classes} aria-label={ariaLabel} aria-disabled={disabled}>{children}</Link>;
   }
 
-  return <button type={type} className={classes} aria-label={ariaLabel} onClick={onClick}>{children}</button>;
+  return <button type={type} className={classes} aria-label={ariaLabel} onClick={onClick} disabled={disabled}>{children}</button>;
 }

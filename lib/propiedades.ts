@@ -66,13 +66,19 @@ export async function getPropiedadBySlug(slug: string): Promise<Propiedad | null
   }
 }
 
-export async function getPropiedadesSimilares(propiedad: Pick<Propiedad, "id" | "comuna" | "tipo">, limit = 3): Promise<Propiedad[]> {
+export async function getPropiedadesSimilares(propiedad: Pick<Propiedad, "id" | "comuna" | "tipo">, limit = 4): Promise<Propiedad[]> {
   try {
     let query = supabase.from("propiedades").select(WITH_AGENT).in("estado", PUBLIC_STATES).neq("id", propiedad.id).limit(limit);
     if (propiedad.comuna) query = query.eq("comuna", propiedad.comuna);
     if (propiedad.tipo) query = query.eq("tipo", propiedad.tipo);
     const { data, error } = await query;
-    return error || !data ? [] : (data as Propiedad[]);
+    const similares = error || !data ? [] : (data as Propiedad[]);
+    if (similares.length >= limit) return similares.slice(0, limit);
+
+    const recent = await getPropiedadesPublicadas({ limit: limit + 8 });
+    const seen = new Set([propiedad.id, ...similares.map((item) => item.id)]);
+    const extra = recent.filter((item) => !seen.has(item.id));
+    return [...similares, ...extra].slice(0, limit);
   } catch {
     return [];
   }

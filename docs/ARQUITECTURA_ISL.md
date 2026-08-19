@@ -141,7 +141,7 @@ la migración. La migración es aditiva y no se ejecuta desde la aplicación.
 5. Home — **completado**
 6. Catálogo y comparador — **completado**
 7. Leads y notificaciones — **completado**
-8. Ficha de propiedad
+8. Ficha de propiedad — **completado**
 9. Admin: estructura y panel
 10. Admin: propiedades
 11. Admin: hero y agentes
@@ -274,5 +274,27 @@ un clic; si no hay, usa el del agente o `whatsapp_general`.
 `TestimoniosCarousel` en Home: teclado, `aria-label` en controles, auto-rotación
 solo sin `prefers-reduced-motion`, pausa con mouse o foco; un testimonio se
 muestra fijo.
+
+## Prompt 8 — Ficha de propiedad
+
+`app/propiedades/[slug]/page.tsx` carga con `getPropiedadBySlug`. Si el slug no
+existe o el estado no es publicada/reservada/vendida, llama `notFound()` y muestra
+`app/propiedades/[slug]/not-found.tsx`. El visual vive en
+`components/isl/FichaPropiedadDetalle.tsx` (`propiedad` + `agente`) para que el
+Prompt 10 pueda previsualizar borradores sin duplicar UI.
+
+Galería: portada + miniaturas ordenadas, lightbox a pantalla completa (teclado,
+swipe, Escape, foco atrapado). Video vía `parseVideoUrl()`. Tour virtual en
+pestaña nueva. Encabezado con badges, `PriceTag` grande en UF y specs con valor.
+Acciones: PDF en el navegador (`lib/pdf-ficha.ts`, jsPDF, una página A4; si la
+foto falla por CORS el PDF igual se descarga), comparar con `useComparador`
+(`isl:comparar`), WhatsApp (`buildWhatsAppLink`) y copiar link. Vendida oculta
+el formulario de visita; reservada lo deja con copy ajustado. Similares (3–4)
+quedan en la página, con relleno de las más recientes.
+
+SEO: `generateMetadata` con title absoluto, description ~155, OG de portada y
+canonical. JSON-LD `RealEstateListing` (sin precio CLP) y `BreadcrumbList`.
+`NEXT_PUBLIC_SITE_URL` es la base canónica; si falta, se usa un placeholder.
+
 
 

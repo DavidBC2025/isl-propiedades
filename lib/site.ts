@@ -18,3 +18,9 @@ export const COMUNAS_BUSQUEDA = [
 export const HOME_HEADLINE_FALLBACK = "Propiedades con criterio en Viña del Mar";
 export const HOME_SUBHEADLINE_FALLBACK = "Silvia e Ivannia te acompañan a comprar o vender con cercanía, de Reñaca a Concón.";
 export const HOME_DESCRIPTION_FALLBACK = "Corredora boutique en Viña del Mar. Silvia e Ivannia trabajan con criterio y trato directo en Reñaca, Recreo, Concón y el Gran Valparaíso.";
+
+export function getPublicSiteUrl(): string {
+  const fromEnv = process.env.NEXT_PUBLIC_SITE_URL?.replace(/\/$/, "");
+  if (fromEnv) return fromEnv;
+  return "https://islpropiedades.cl";
+}

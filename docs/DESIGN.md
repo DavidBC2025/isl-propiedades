@@ -67,7 +67,8 @@ Si un bloque no tiene datos reales, se muestra `EmptyState` (salvo testimonios, 
 | `ArticleCard` | Preview de guía; link a `/guia/[slug]` |
 | `TestimonialCarousel` / `TestimoniosCarousel` | Solo con testimonios reales; teclado ← →; pausa al hover/foco |
 | `SiteHeader` / `SiteFooter` | Nav compartida; overlay en Home |
-| `CompareBar` | Home y catálogo. Solo si hay selección en `isl:comparar` |
+| `CompareBar` | Home, catálogo y ficha. Solo si hay selección en `isl:comparar` |
+| `FichaPropiedadDetalle` | Ficha pública y futura vista previa admin. Props: `propiedad`, `agente` |
 | `CatalogPagination` | Catálogo. Enlaces GET, sin depender de JS |
 | `MediaUploader` | Admin (Prompt 9+). Nunca en páginas públicas |
 
@@ -105,6 +106,12 @@ grilla es la misma de Home (`ListingCard`, 4:5). Cero resultados: `EmptyState`,
 nunca una grilla vacía. El comparador es una barra fija inferior; no anima con
 rebotes. La tabla de `/comparar` se desplaza en horizontal en mobile
 (`overflow-x-auto`) y muestra precios solo con `PriceTag` / `formatUF`.
+
+## Ficha de propiedad
+
+Ritmo: galería → encabezado UF → acciones → descripción → características →
+mapa OSM o dirección → agente → visita (o aviso de vendida). Lightbox sin
+auto-rotación. PDF solo en el cliente. Sin cifras de visitas ni urgencia falsa.
 
 ## Continuidad
 
