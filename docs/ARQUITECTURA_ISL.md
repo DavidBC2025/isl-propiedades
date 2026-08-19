@@ -137,7 +137,7 @@ la migración. La migración es aditiva y no se ejecuta desde la aplicación.
 1. Auditoría y datos — **completado**
 2. Sistema de diseño — **completado**
 3. Motor de fotos y video — **completado**
-4. Componentes de contenido y datos
+4. Componentes de contenido y datos — **completado**
 5. Home
 6. Catálogo y comparador
 7. Leads y notificaciones
@@ -179,3 +179,28 @@ indicador de actividad y subida a Supabase Storage. Sus miniaturas se guardan en
 la carpeta `thumbnails` bajo el mismo prefijo. `HeroMedia` usa `parseVideoUrl`,
 incluye video directo o embed, overlay, fallback y Ken Burns de 8 segundos que
 respeta `prefers-reduced-motion`. Se instaló únicamente `heic2any`.
+
+## Prompt 4 — Componentes de contenido y capa de datos
+
+Se tipó el contrato público en `types/isl.ts` (Agente, Propiedad, HeroSlide,
+CasoPreparacion, Articulo con `es_reporte`/`archivo_pdf_url`, Testimonio, Lead con
+`notificado`/`notificado_en`, Barrio, Alerta, SiteSettings con `como_trabajamos`)
+alineado a `supabase/migrations/0001_isl_init.sql`.
+
+Tarjetas y formulario, sin páginas nuevas: `ListingCard` (4:5, overlay, PriceTag,
+link a `/propiedades/[slug]`, placeholder si no hay foto), `AgentCard` (WhatsApp
+vía `buildWhatsAppLink()`), `LeadForm` (honeypot, `hiddenFields`/`extraFields`,
+consentimiento, inputs 16px y botones ≥44px). `/api/leads` es un stub 501 hasta
+el Prompt 7.
+
+Capa de datos con el cliente de `lib/supabase.ts`, try/catch y `[]`/`null` si
+falla o no hay tabla: `lib/propiedades.ts` (join `agente:agentes(*)` en una sola
+consulta), `lib/agentes.ts`, `lib/hero.ts`, `lib/articulos.ts`, `lib/barrios.ts`,
+`lib/testimonios.ts`, `lib/settings.ts`, `lib/casos-preparacion.ts`.
+`lib/format.ts` aporta `formatUF`, `slugify` y `formatComuna`. `createLead` queda
+tipado en `lib/leads.ts` sin envío de correo todavía.
+
+Se creó `docs/DESIGN.md` (tokens, ritmo de Home, motion 500ms/8s, bloques,
+patrones de video/WhatsApp/EmptyState, copy local). `.isl-fade-up` pasó a 500ms
+para coincidir con ese documento. `PriceTag` acepta `null` para `precio_uf`.
+La página de catálogo vigente no se reemplazó.

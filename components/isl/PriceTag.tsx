@@ -1,5 +1,5 @@
 type PriceTagProps = {
-  value: number | string;
+  value: number | string | null | undefined;
   dark?: boolean;
   className?: string;
 };

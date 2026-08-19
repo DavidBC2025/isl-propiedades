@@ -92,5 +92,5 @@ a {
 
 @media (prefers-reduced-motion: no-preference) {
   .isl-kenburns { animation: isl-kenburns 8s ease-out both; }
-  .isl-fade-up { animation: isl-fade-up 600ms ease-out both; }
+  .isl-fade-up { animation: isl-fade-up 500ms ease-out both; }
 }
