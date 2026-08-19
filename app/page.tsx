@@ -4,6 +4,7 @@ import { Container } from "@/components/isl/Container";
 import { EmptyState } from "@/components/isl/EmptyState";
 import { HomeHero } from "@/components/isl/HomeHero";
 import { LeadForm } from "@/components/isl/LeadForm";
+import { CompareBar } from "@/components/isl/CompareBar";
 import { ListingCard } from "@/components/isl/ListingCard";
 import { QuickSearch } from "@/components/isl/QuickSearch";
 import { SectionTitle } from "@/components/isl/SectionTitle";
@@ -76,7 +77,7 @@ export default async function Home() {
             {seleccion.length > 0 ? (
               <div className="mt-12 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
                 {seleccion.map((propiedad) => (
-                  <ListingCard key={propiedad.id} propiedad={propiedad} />
+                  <ListingCard key={propiedad.id} propiedad={propiedad} enableCompare={true} />
                 ))}
               </div>
             ) : (
@@ -207,6 +208,7 @@ export default async function Home() {
         </section>
       </main>
 
+      <CompareBar />
       <SiteFooter email={settings?.email_general} whatsapp={settings?.whatsapp_general} />
     </>
   );

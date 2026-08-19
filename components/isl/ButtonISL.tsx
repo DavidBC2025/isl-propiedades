@@ -9,6 +9,7 @@ type ButtonISLProps = {
   size?: ButtonSize;
   href?: string;
   type?: ButtonHTMLAttributes<HTMLButtonElement>["type"];
+  onClick?: ButtonHTMLAttributes<HTMLButtonElement>["onClick"];
   children: ReactNode;
   className?: string;
   "aria-label"?: string;
@@ -33,6 +34,7 @@ export function ButtonISL({
   size = "md",
   href,
   type = "button",
+  onClick,
   children,
   className,
   "aria-label": ariaLabel,
@@ -48,5 +50,5 @@ export function ButtonISL({
     return <Link href={href} className={classes} aria-label={ariaLabel}>{children}</Link>;
   }
 
-  return <button type={type} className={classes} aria-label={ariaLabel}>{children}</button>;
+  return <button type={type} className={classes} aria-label={ariaLabel} onClick={onClick}>{children}</button>;
 }

@@ -139,7 +139,7 @@ la migración. La migración es aditiva y no se ejecuta desde la aplicación.
 3. Motor de fotos y video — **completado**
 4. Componentes de contenido y datos — **completado**
 5. Home — **completado**
-6. Catálogo y comparador
+6. Catálogo y comparador — **completado**
 7. Leads y notificaciones
 8. Ficha de propiedad
 9. Admin: estructura y panel
@@ -225,3 +225,30 @@ nunca queda en blanco. Buscador nativo `method="get"` con `comuna`, `operacion`,
 Layout de sitio: `SiteHeader` (overlay en Home) y `SiteFooter` con nav a rutas
 aún no construidas, contacto desde `email_general` / `whatsapp_general` y año
 dinámico. Newsletter: `LeadForm` tipo `newsletter` y solo el campo correo.
+
+## Prompt 6 — Catálogo y comparador
+
+`app/propiedades/page.tsx` es el catálogo público. Lee `comuna`, `operacion`,
+`tipo`, `precio_min` / `precio_min_uf`, `precio_max` / `precio_max_uf`,
+`dormitorios` y `page` desde `searchParams` (`lib/catalogo.ts`). El Home sigue
+enviando `precio_min_uf` y `precio_max_uf`; ambos nombres funcionan. La barra
+reutiliza `QuickSearch` con los valores actuales y el campo extra de dormitorios.
+
+La grilla usa `ListingCard` con `enableCompare={true}`. Paginación por `?page=N`
+en el servidor (12 por página, enlaces `<a>`). Cero resultados: `EmptyState` e
+invitación a `/alertas` con los filtros precargados (ruta del Prompt 7).
+
+`getPropiedadesPublicadas` acepta `page` / `pageSize`. Se añadieron
+`countPropiedadesPublicadas` y `getPropiedadesPorSlugs` (respeta el orden de los
+slugs).
+
+Comparador 100% en el navegador: `lib/useComparador.ts` guarda slugs en
+`localStorage` bajo `isl:comparar`, máximo 3. La 4.ª no se agrega y muestra
+«Puedes comparar hasta 3 propiedades a la vez». `ListingCard` no se reescribió:
+ganó `enableCompare` y un checkbox hermano del link (`CompareToggle`) para no
+anidar controles dentro del `<a>`. `CompareBar` flota abajo en Home y catálogo.
+
+`app/comparar/page.tsx` lee `?slugs=a,b,c`. Menos de 2 slugs válidos: EmptyState.
+2 o 3: tabla comparativa (UF, comuna, sector, dormitorios, baños, m², gastos
+comunes UF, orientación, vista) con `overflow-x-auto` en mobile.
+

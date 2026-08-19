@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { CompareToggle } from "@/components/isl/CompareToggle";
 import { PriceTag } from "@/components/isl/PriceTag";
 import { formatComuna } from "@/lib/format";
 import type { Propiedad } from "@/types/isl";
@@ -6,6 +7,7 @@ import type { Propiedad } from "@/types/isl";
 type ListingCardProps = {
   propiedad: Propiedad;
   className?: string;
+  enableCompare?: boolean;
 };
 
 function operationLabel(operacion: Propiedad["operacion"]): string {
@@ -18,14 +20,15 @@ function statusLabel(estado: Propiedad["estado"]): string | null {
   return null;
 }
 
-export function ListingCard({ propiedad, className }: ListingCardProps) {
+export function ListingCard({ propiedad, className, enableCompare = false }: ListingCardProps) {
   const images = Array.isArray(propiedad.imagenes) ? propiedad.imagenes : [];
   const portada = images.find((image) => image.portada) ?? images[0];
   const dimensions = propiedad.m2_construidos ?? propiedad.m2_terreno;
   const status = statusLabel(propiedad.estado);
 
   return (
-    <Link href={`/propiedades/${propiedad.slug}`} className={["group block", className].filter(Boolean).join(" ")}>
+    <div className={["group relative", className].filter(Boolean).join(" ")}>
+      <Link href={`/propiedades/${propiedad.slug}`} className="block">
       <article className="overflow-hidden rounded-sm bg-isl-offwhite">
         <div className="relative aspect-[4/5] overflow-hidden bg-isl-champagne/40">
           {portada?.url ? (
@@ -58,6 +61,17 @@ export function ListingCard({ propiedad, className }: ListingCardProps) {
           </p>
         </div>
       </article>
-    </Link>
+      </Link>
+      {enableCompare ? (
+        <CompareToggle
+          snapshot={{
+            slug: propiedad.slug,
+            titulo: propiedad.titulo,
+            imagen: portada?.url ?? null,
+            precio_uf: propiedad.precio_uf,
+          }}
+        />
+      ) : null}
+    </div>
   );
 }

@@ -67,6 +67,8 @@ Si un bloque no tiene datos reales, se muestra `EmptyState` (salvo testimonios, 
 | `ArticleCard` | Preview de guía; link a `/guia/[slug]` |
 | `TestimonialCarousel` | Solo con testimonios reales; teclado ← → |
 | `SiteHeader` / `SiteFooter` | Nav compartida; overlay en Home |
+| `CompareBar` | Home y catálogo. Solo si hay selección en `isl:comparar` |
+| `CatalogPagination` | Catálogo. Enlaces GET, sin depender de JS |
 | `MediaUploader` | Admin (Prompt 9+). Nunca en páginas públicas |
 
 ### `MediaUploader` por `kind`
@@ -93,6 +95,14 @@ Español de Chile, simple y cercano. Comunas y sectores del área de trabajo, si
 Viña del Mar, Reñaca, Recreo, Concón, Olmué, Quilpué, Peñablanca, Villa Alemana.
 
 `formatComuna()` capitaliza para UI. Precios siempre en UF.
+
+## Catálogo y comparador
+
+El catálogo (`/propiedades`) replica el buscador del Home y suma dormitorios. La
+grilla es la misma de Home (`ListingCard`, 4:5). Cero resultados: `EmptyState`,
+nunca una grilla vacía. El comparador es una barra fija inferior; no anima con
+rebotes. La tabla de `/comparar` se desplaza en horizontal en mobile
+(`overflow-x-auto`) y muestra precios solo con `PriceTag` / `formatUF`.
 
 ## Continuidad
 
