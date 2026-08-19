@@ -138,7 +138,7 @@ la migración. La migración es aditiva y no se ejecuta desde la aplicación.
 2. Sistema de diseño — **completado**
 3. Motor de fotos y video — **completado**
 4. Componentes de contenido y datos — **completado**
-5. Home
+5. Home — **completado**
 6. Catálogo y comparador
 7. Leads y notificaciones
 8. Ficha de propiedad
@@ -204,3 +204,24 @@ Se creó `docs/DESIGN.md` (tokens, ritmo de Home, motion 500ms/8s, bloques,
 patrones de video/WhatsApp/EmptyState, copy local). `.isl-fade-up` pasó a 500ms
 para coincidir con ese documento. `PriceTag` acepta `null` para `precio_uf`.
 La página de catálogo vigente no se reemplazó.
+
+## Prompt 5 — Home
+
+`app/page.tsx` deja de consultar `Propiedades` y pasa a ser el Home público con el
+ritmo de `docs/DESIGN.md`: hero, selección curada, buscador GET a `/propiedades`,
+mirada ISL, por qué, CTA vender, guía, testimonios (solo si hay datos) y
+newsletter. `generateMetadata` usa título absoluto y description desde
+`site_settings` o un fallback fijo. `revalidate = 120` reemplaza `force-dynamic`.
+
+Hero: `HomeHero` + `HeroMedia`. Carrusel por fade de `hero_slides` activos; con
+`prefers-reduced-motion` o un solo slide no rota. Fallback a
+`getPropiedadPrincipal()` y, si no hay nada, marca + headline de settings.
+CTAs por defecto: Ver propiedades / Quiero vender (`/vender`).
+
+Cero datos: selección y guía usan `EmptyState`; testimonios se omiten; el hero
+nunca queda en blanco. Buscador nativo `method="get"` con `comuna`, `operacion`,
+`tipo`, `precio_min_uf`, `precio_max_uf` (el catálogo los lee en el Prompt 6).
+
+Layout de sitio: `SiteHeader` (overlay en Home) y `SiteFooter` con nav a rutas
+aún no construidas, contacto desde `email_general` / `whatsapp_general` y año
+dinámico. Newsletter: `LeadForm` tipo `newsletter` y solo el campo correo.

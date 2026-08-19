@@ -26,18 +26,20 @@ Variables en el layout raíz: `--font-isl-serif`, `--font-isl-sans`.
 
 ## Ritmo de Home (inspirado en Ogroup)
 
-El Home se construye en el Prompt 5. Este es el orden de bloques, no el markup:
+El Home público (`app/page.tsx`, Prompt 5) sigue este pulso:
 
-1. **Hero** — slide activo, overlay, titular y CTAs.
-2. **Selección** — propiedad principal y/o destacadas.
-3. **Buscador** — filtros hacia el catálogo.
-4. **Mirada ISL** — posicionamiento editorial (sin inventar casos).
-5. **Por qué** — `como_trabajamos` de `site_settings`, o EmptyState si no hay datos.
-6. **Enlistar** — invitación a vender, formulario o CTA.
-7. **Guía** — artículos publicados / reportes.
-8. **Footer** — contacto, WhatsApp general, barrios.
+1. **Hero** — `hero_slides`, o propiedad principal, o fallback de marca. Fade 8s; sin rotar con `prefers-reduced-motion`.
+2. **Selección** — hasta 6 `ListingCard`; `EmptyState` si no hay publicadas.
+3. **Buscador** — GET nativo a `/propiedades`.
+4. **Mirada ISL** — copy de Silvia e Ivannia; fotos de agentes si existen, si no placeholder de marca.
+5. **Por qué** — `como_trabajamos` o los cuatro puntos editoriales (sin cifras).
+6. **Enlistar** — CTA a `/vender`.
+7. **Guía** — 3 artículos o `EmptyState`.
+8. **Testimonios** — solo si hay publicados; carrusel sin autoavance si hay 1 o reduced-motion.
+9. **Newsletter** — `LeadForm` solo con correo.
+10. **Footer** — nav, `email_general`, `whatsapp_general`, año dinámico.
 
-Si un bloque no tiene datos reales, se muestra `EmptyState`. Nunca rellenar con propiedades, testimonios, artículos ni agentes de ejemplo.
+Si un bloque no tiene datos reales, se muestra `EmptyState` (salvo testimonios, que se omiten). Nunca rellenar con propiedades, testimonios, artículos ni agentes de ejemplo.
 
 ## Motion
 
@@ -60,6 +62,11 @@ Si un bloque no tiene datos reales, se muestra `EmptyState`. Nunca rellenar con 
 | `ListingCard` | Grilla de propiedades. Link a `/propiedades/[slug]` |
 | `AgentCard` | Equipo. WhatsApp solo con `buildWhatsAppLink()` |
 | `LeadForm` | Contacto, tasación, visita, newsletter, etc. `hiddenFields` para contextos cortos |
+| `HomeHero` | Solo Home: slides, fallback de marca y CTAs |
+| `QuickSearch` | Buscador GET a `/propiedades` |
+| `ArticleCard` | Preview de guía; link a `/guia/[slug]` |
+| `TestimonialCarousel` | Solo con testimonios reales; teclado ← → |
+| `SiteHeader` / `SiteFooter` | Nav compartida; overlay en Home |
 | `MediaUploader` | Admin (Prompt 9+). Nunca en páginas públicas |
 
 ### `MediaUploader` por `kind`

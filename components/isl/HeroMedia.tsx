@@ -4,18 +4,19 @@ import { parseVideoUrl } from "@/lib/media";
 type HeroMediaProps = {
   imageUrl?: string;
   videoUrl?: string;
+  autoPlayVideo?: boolean;
   children?: ReactNode;
   className?: string;
 };
 
-export function HeroMedia({ imageUrl, videoUrl, children, className }: HeroMediaProps) {
+export function HeroMedia({ imageUrl, videoUrl, autoPlayVideo = true, children, className }: HeroMediaProps) {
   const video = videoUrl ? parseVideoUrl(videoUrl) : { kind: "unknown" as const };
   const hasEmbeddableVideo = (video.kind === "youtube" || video.kind === "vimeo") && video.embedUrl;
 
   return (
     <section className={["relative isolate min-h-[34rem] overflow-hidden bg-isl-black md:min-h-screen", className].filter(Boolean).join(" ")}>
       {video.kind === "file" && videoUrl ? (
-        <video className="absolute inset-0 size-full object-cover" autoPlay muted loop playsInline>
+        <video className="absolute inset-0 size-full object-cover" autoPlay={autoPlayVideo} muted loop playsInline>
           <source src={videoUrl} />
         </video>
       ) : hasEmbeddableVideo ? (
