@@ -97,6 +97,26 @@ export async function getAdminLeads(): Promise<Lead[]> {
   }
 }
 
+export async function getAdminPropiedadById(id: string): Promise<Propiedad | null> {
+  try {
+    const supabase = await createServerSupabase();
+    const { data, error } = await supabase.from("propiedades").select("*, agente:agentes(*)").eq("id", id).maybeSingle();
+    return error || !data ? null : (data as Propiedad);
+  } catch {
+    return null;
+  }
+}
+
+export async function getAdminAgentes(): Promise<Agente[]> {
+  try {
+    const supabase = await createServerSupabase();
+    const { data, error } = await supabase.from("agentes").select("*").order("orden", { ascending: true });
+    return error || !data ? [] : (data as Agente[]);
+  } catch {
+    return [];
+  }
+}
+
 export async function countConsultasNuevas(): Promise<number> {
   try {
     const supabase = await createServerSupabase();
@@ -104,5 +124,15 @@ export async function countConsultasNuevas(): Promise<number> {
     return error || count == null ? 0 : count;
   } catch {
     return 0;
+  }
+}
+
+export async function getAdminHeroSlides(): Promise<HeroSlide[]> {
+  try {
+    const supabase = await createServerSupabase();
+    const { data, error } = await supabase.from("hero_slides").select("*").order("orden", { ascending: true });
+    return error || !data ? [] : (data as HeroSlide[]);
+  } catch {
+    return [];
   }
 }

@@ -143,8 +143,8 @@ la migración. La migración es aditiva y no se ejecuta desde la aplicación.
 7. Leads y notificaciones — **completado**
 8. Ficha de propiedad — **completado**
 9. Admin: estructura y panel — **completado**
-10. Admin: propiedades
-11. Admin: hero y agentes
+10. Admin: propiedades — **completado**
+11. Admin: hero y agentes — **completado**
 12. Admin: barrios, guía y testimonios
 13. Admin: consultas y ajustes
 14. Páginas comerciales y barrios públicos
@@ -323,6 +323,106 @@ Primeros pasos se calcula solo con datos reales (perfil de agente, WhatsApp +
 titular, propiedad publicada con fotos, destacado, barrio publicado). Si las
 tablas están vacías o fallan, todo queda pendiente y no se rompe. Se oculta al
 cumplir los 5 o al minimizar a mano (`isl:admin:primeros-pasos-oculto`).
+
+## Prompt 10 — Admin: módulo de propiedades
+
+Se completó el módulo central del admin donde Silvia e Ivannia cargan propiedades
+con fotos y video. El diseño prioriza eficiencia operativa y UX móvil.
+
+**Rutas creadas:**
+
+| Ruta | Archivo | Función |
+| --- | --- | --- |
+| `/admin/propiedades` | `app/admin/(app)/propiedades/page.tsx` | Listado con filtro instantáneo y acciones rápidas |
+| `/admin/propiedades/nueva` | `app/admin/(app)/propiedades/nueva/page.tsx` | Formulario de nueva propiedad |
+| `/admin/propiedades/[id]/editar` | `app/admin/(app)/propiedades/[id]/editar/page.tsx` | Formulario de edición |
+| `/admin/propiedades/[id]/vista-previa` | `app/admin/(app)/propiedades/[id]/vista-previa/page.tsx` | Vista previa protegida |
+
+**Server actions (propiedades/actions.ts):**
+
+- `guardarPropiedad`: Crea o actualiza propiedad, genera slug único, maneja estados (borrador/publicada/mantener), revalida rutas relevantes.
+- `cambiarEstadoPropiedad`: Publica o despublica en un clic.
+- `duplicarPropiedad`: Crea copia en borrador con "(copia)" en título, sin fotos.
+- `eliminarPropiedad`: Elimina con confirmación previa en UI.
+
+**Componentes creados:**
+
+- `PropiedadesListado`: Grilla de tarjetas con miniatura, título, precio UF, estado (con color), comuna. Filtro por estado y buscador por título que responden al instante en el navegador. Menú de acciones: Editar, Duplicar, Vista previa, Descargar ficha PDF, Generar imagen para redes, Publicar/Despublicar, Eliminar (con confirmación).
+- `PropiedadForm`: Formulario organizado en secciones (Datos básicos, Precio y operación, Características, Fotos y video, Ubicación, Agente a cargo). Cada campo con ayuda corta en lenguaje simple. Valores por defecto inteligentes (recuerda última operación y comuna usadas, pre-carga agente si la autenticación lo permite). MediaUploader para fotos (múltiples) y video (archivo o link). Recuperación de borrador sin guardar via sessionStorage. Botón flotante de guardar/publicar. Validación de 5 campos mínimos. Advertencia nativa al salir con cambios sin guardar.
+- `EstadoBadge`: Badge de estado con color (borrador gris, publicada verde, reservada ámbar, vendida azul, despublicada rojo suave).
+- `FichaPdfButton`: Botón que reutiliza `lib/pdf-ficha.ts` para descargar ficha PDF.
+- `ImagenRedesButton`: Botón con formato cuadrado (1080x1080) o historia (1080x1920), deshabilitado si no hay foto.
+- `FieldHelp`: Componente de campo con etiqueta y ayuda.
+
+**Librerías creadas:**
+
+- `lib/social-image.ts`: `generateSocialImage(propiedad, formato)` dibuja en canvas del navegador: foto de portada + degradado inferior oscuro + título + precio UF + comuna + "ISL Propiedades" en Cormorant Garamond. Maneja CORS y fallback.
+- `lib/propiedad-admin.ts`: Tipos `PropiedadFormValues` y `PropiedadGuardarInput`, funciones de conversión, validación, y utilidades para borrador y defaults inteligentes (COMUNAS_ISL, LAST_OPERACION_KEY, LAST_COMUNA_KEY).
+- `lib/admin.ts`: `getAdminPropiedades`, `getAdminPropiedadById`, `getAdminAgentes` (usando el cliente SSR).
+- `lib/admin-copy.ts`: Copia administrativa: ADMIN_NAV, ESTADO_PROPIEDAD, AVISO_ADMIN, TIPO_CONSULTA, ESTADO_CONSULTA.
+
+**Patrones de UX:**
+
+- Sin jerga técnica en pantalla.
+- Confirmaciones breves y claras en cada acción que graba datos.
+- Eliminar siempre pide confirmación explícita.
+- Recuperación de borrador sin guardar con pregunta al usuario (nunca silenciosa).
+- Campos mínimos obligatorios: título, precio_uf, comuna, operación, tipo.
+- Formulario funciona perfecto en móvil, incluyendo cámara directa.
+- Filtro y buscador responden al instante sin recargar página.
+- Duplicar ahorra trabajo para propiedades parecidas.
+
+**No se modificó:**
+
+- Sistema de autenticación existente.
+- Home, catálogo ni ficha pública (se reutiliza FichaPropiedadDetalle tal cual).
+- Otras secciones del admin (Prompts 11–13).
+
+## Prompt 11 — Admin: Hero y Agentes
+
+Se completaron dos secciones más rápidas del admin: gestión de destacados de portada y perfiles de agentes.
+
+**Rutas creadas:**
+
+| Ruta | Archivo | Función |
+| --- | --- | --- |
+| `/admin/hero` | `app/admin/(app)/hero/page.tsx` | Gestión de hero_slides (destacados de portada) |
+| `/admin/agentes` | `app/admin/(app)/agentes/page.tsx` | Gestión de perfiles de agentes |
+
+**Server actions (hero/actions.ts):**
+
+- `guardarHeroSlide`: Crea o actualiza slide con validación de máximo 5 activos. Soporta imagen o video, título, subtítulo, y dos CTAs (propiedad, página del sitio, o link manual).
+- `eliminarHeroSlide`: Elimina slide con confirmación previa en UI.
+- `reordenarHeroSlides`: Reordena slides por arrastrar y soltar.
+- `crearHeroDesdePropiedad`: Crea slide nuevo precargado desde una propiedad (usado desde listado de propiedades).
+
+**Server actions (agentes/actions.ts):**
+
+- `guardarAgente`: Crea o actualiza agente con slug único automático. Campos: foto, nombre, apellido, rol, bio, email, whatsapp, especialidad, activo.
+- `eliminarAgente`: Elimina agente con confirmación previa en UI.
+
+**Componentes creados:**
+
+- `HeroSlideForm`: Formulario para crear/editar slides. Selector de tipo (imagen/video), MediaUploader para bucket "contenidos" pathPrefix "hero", campos de texto, y selector inteligente para CTAs (propiedad → autocompleta link a ficha, página del sitio → selector simple, link manual → input).
+- `HeroSlidesListado`: Lista ordenable de slides. Muestra contador de activos (máximo 5), modo de reordenar por arrastrar, y acciones (editar, eliminar). Valida tope de 5 activos con mensaje amable.
+- `AgenteForm`: Formulario para crear/editar agentes. Organizado en secciones: Foto, Información personal, Contacto, Especialidad, Estado. MediaUploader para bucket "contenidos" pathPrefix "agentes".
+- `AgentesListado`: Grilla de tarjetas de agentes con foto, nombre, rol, especialidad, estado. Acciones (editar, eliminar).
+
+**Librerías actualizadas:**
+
+- `lib/admin.ts`: Agregada `getAdminHeroSlides()` para listar slides ordenados.
+
+**Funcionalidades implementadas:**
+
+- **Tope de 5 destacados activos**: Validación en `guardarHeroSlide` y `crearHeroDesdePropiedad` con mensaje "Ya tienes 5 destacados activos, desactiva uno primero para activar este."
+- **"Usar como destacado" desde propiedades**: Acción agregada en `PropiedadesListado` que llama `crearHeroDesdePropiedad`. Precarga datos desde la propiedad (foto de portada, título, subtítulo con operación/comuna, CTA a ficha).
+- **Edición de perfiles de agentes**: Formulario completo con foto, nombre, apellido, rol, bio, email, whatsapp, especialidad, estado activo. Optimizado para Silvia e Ivannia con UX rápida.
+
+**No se modificó:**
+
+- Sistema de autenticación existente.
+- Home, catálogo ni ficha pública.
+- Otras secciones del admin (Prompts 12–13).
 
 
 

@@ -1,9 +1,9 @@
 "use client";
 
-import { type ChangeEvent, type DragEvent, useEffect, useRef, useState } from "react";
+import { type ChangeEvent, type DragEvent, useEffect, useMemo, useRef, useState } from "react";
 import { createImageThumbnail, isHeicFile, optimizeImageForUpload } from "@/lib/image-client";
 import { parseVideoUrl } from "@/lib/media";
-import { supabase } from "@/lib/supabase";
+import { createBrowserSupabase } from "@/lib/supabase/browser";
 
 type MediaKind = "image" | "image-multiple" | "video" | "pdf";
 
@@ -56,6 +56,7 @@ export function MediaUploader({
   allowUrlInstead = false,
   onChange,
 }: MediaUploaderProps) {
+  const supabase = useMemo(() => createBrowserSupabase(), []);
   const initialUrlsKey = existingUrls?.join("\u0000") ?? "";
   const [items, setItems] = useState<UploadedItem[]>(() => toItems(existingUrls ?? []));
   const itemsRef = useRef(items);
