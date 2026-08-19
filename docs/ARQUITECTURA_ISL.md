@@ -140,7 +140,7 @@ la migración. La migración es aditiva y no se ejecuta desde la aplicación.
 4. Componentes de contenido y datos — **completado**
 5. Home — **completado**
 6. Catálogo y comparador — **completado**
-7. Leads y notificaciones
+7. Leads y notificaciones — **completado**
 8. Ficha de propiedad
 9. Admin: estructura y panel
 10. Admin: propiedades
@@ -251,4 +251,28 @@ anidar controles dentro del `<a>`. `CompareBar` flota abajo en Home y catálogo.
 `app/comparar/page.tsx` lee `?slugs=a,b,c`. Menos de 2 slugs válidos: EmptyState.
 2 o 3: tabla comparativa (UF, comuna, sector, dormitorios, baños, m², gastos
 comunes UF, orientación, vista) con `overflow-x-auto` en mobile.
+
+## Prompt 7 — Leads y notificaciones
+
+`/api/leads` dejó de ser un stub 501. Valida honeypot (200 silencioso), inserta
+con `createLead()` y después intenta notificar. Si la tabla `leads` no existe,
+responde 503 con mensaje claro. El correo va por `fetch` nativo a Resend
+(`RESEND_API_KEY`); el remitente por defecto es
+`ISL Propiedades <notificaciones@tudominio.cl>` (el dominio debe estar
+verificado). Destino: correo del agente si hay `agente_id`, si no
+`email_general`. Un fallo de Resend o la ausencia de la clave se registra en
+consola y no se muestra al visitante. Si Resend responde OK, se llama
+`marcar_lead_notificado` (migración `0002`). El botón de WhatsApp del correo se
+arma con `buildWhatsAppLink()`: prioriza el teléfono del lead para responder en
+un clic; si no hay, usa el del agente o `whatsapp_general`.
+
+`/api/alertas` inserta en `alertas` con token `crypto.randomUUID()`.
+`/alertas` precarga filtros del catálogo. `/alertas/baja/[token]` llama
+`baja_alerta`: token real → confirmación y `activa = false`; token inventado →
+«Este enlace ya no es válido».
+
+`TestimoniosCarousel` en Home: teclado, `aria-label` en controles, auto-rotación
+solo sin `prefers-reduced-motion`, pausa con mouse o foco; un testimonio se
+muestra fijo.
+
 

@@ -10,7 +10,7 @@ import { QuickSearch } from "@/components/isl/QuickSearch";
 import { SectionTitle } from "@/components/isl/SectionTitle";
 import { SiteFooter } from "@/components/isl/SiteFooter";
 import { SiteHeader } from "@/components/isl/SiteHeader";
-import { TestimonialCarousel } from "@/components/isl/TestimonialCarousel";
+import { TestimoniosCarousel } from "@/components/isl/TestimoniosCarousel";
 import { ButtonISL } from "@/components/isl/ButtonISL";
 import { getAgentesActivos } from "@/lib/agentes";
 import { getArticulosPublicados } from "@/lib/articulos";
@@ -187,7 +187,7 @@ export default async function Home() {
             <Container>
               <SectionTitle subtitle="Voces" title="Lo que cuentan quienes ya caminaron con nosotras" className="mx-auto max-w-2xl text-center" />
               <div className="mt-12">
-                <TestimonialCarousel testimonios={testimonios} />
+                <TestimoniosCarousel testimonios={testimonios} />
               </div>
             </Container>
           </section>

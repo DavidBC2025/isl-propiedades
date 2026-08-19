@@ -65,7 +65,7 @@ Si un bloque no tiene datos reales, se muestra `EmptyState` (salvo testimonios, 
 | `HomeHero` | Solo Home: slides, fallback de marca y CTAs |
 | `QuickSearch` | Buscador GET a `/propiedades` |
 | `ArticleCard` | Preview de guía; link a `/guia/[slug]` |
-| `TestimonialCarousel` | Solo con testimonios reales; teclado ← → |
+| `TestimonialCarousel` / `TestimoniosCarousel` | Solo con testimonios reales; teclado ← →; pausa al hover/foco |
 | `SiteHeader` / `SiteFooter` | Nav compartida; overlay en Home |
 | `CompareBar` | Home y catálogo. Solo si hay selección en `isl:comparar` |
 | `CatalogPagination` | Catálogo. Enlaces GET, sin depender de JS |
@@ -86,7 +86,9 @@ Bucket `propiedades` para listing; `contenidos` para el resto. Límite operativo
 - **WhatsApp:** armar enlaces solo con `buildWhatsAppLink()` de `lib/whatsapp.ts`. Normaliza celulares chilenos de 9 dígitos.
 - **Estados vacíos:** siempre `components/isl/EmptyState`. Copy cercano, sin culpar al usuario.
 - **Datos:** cada `get*` en `lib/` atrapa errores y devuelve `[]` o `null`. Propiedades con agente en un solo `select` anidado (`agente:agentes(*)`).
-- **Leads:** el formulario hace POST a `/api/leads`. Hasta el Prompt 7 la ruta responde 501; `createLead` queda tipado en `lib/leads.ts`.
+- **Leads:** el formulario hace POST a `/api/leads`. Honeypot silencioso, insert
+  antes de notificar, Resend opcional. Alertas: POST `/api/alertas` y baja en
+  `/alertas/baja/[token]`.
 
 ## Copy local
 
