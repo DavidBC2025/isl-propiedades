@@ -1,5 +1,5 @@
 import { createServerSupabase } from "@/lib/supabase/server";
-import type { Agente, Barrio, HeroSlide, Lead, Propiedad, SiteSettings } from "@/types/isl";
+import type { Agente, Barrio, CasoPreparacion, HeroSlide, Lead, Propiedad, SiteSettings, Articulo, Testimonio } from "@/types/isl";
 
 export type PrimerosPasos = {
   perfilAgente: boolean;
@@ -132,6 +132,56 @@ export async function getAdminHeroSlides(): Promise<HeroSlide[]> {
     const supabase = await createServerSupabase();
     const { data, error } = await supabase.from("hero_slides").select("*").order("orden", { ascending: true });
     return error || !data ? [] : (data as HeroSlide[]);
+  } catch {
+    return [];
+  }
+}
+
+export async function getAdminBarrios(): Promise<Barrio[]> {
+  try {
+    const supabase = await createServerSupabase();
+    const { data, error } = await supabase.from("barrios").select("*").order("nombre", { ascending: true });
+    return error || !data ? [] : (data as Barrio[]);
+  } catch {
+    return [];
+  }
+}
+
+export async function getAdminArticulos(): Promise<Articulo[]> {
+  try {
+    const supabase = await createServerSupabase();
+    const { data, error } = await supabase.from("articulos").select("*").order("created_at", { ascending: false });
+    return error || !data ? [] : (data as Articulo[]);
+  } catch {
+    return [];
+  }
+}
+
+export async function getAdminTestimonios(): Promise<Testimonio[]> {
+  try {
+    const supabase = await createServerSupabase();
+    const { data, error } = await supabase.from("testimonios").select("*").order("created_at", { ascending: false });
+    return error || !data ? [] : (data as Testimonio[]);
+  } catch {
+    return [];
+  }
+}
+
+export async function getAdminSettings(): Promise<SiteSettings | null> {
+  try {
+    const supabase = await createServerSupabase();
+    const { data, error } = await supabase.from("site_settings").select("*").eq("id", 1).maybeSingle();
+    return error || !data ? null : (data as SiteSettings);
+  } catch {
+    return null;
+  }
+}
+
+export async function getAdminCasosPreparacion(): Promise<CasoPreparacion[]> {
+  try {
+    const supabase = await createServerSupabase();
+    const { data, error } = await supabase.from("casos_preparacion").select("*, propiedad:propiedades(*)").order("orden", { ascending: true });
+    return error || !data ? [] : (data as CasoPreparacion[]);
   } catch {
     return [];
   }

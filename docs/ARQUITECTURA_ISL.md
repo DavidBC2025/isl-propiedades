@@ -145,7 +145,7 @@ la migración. La migración es aditiva y no se ejecuta desde la aplicación.
 9. Admin: estructura y panel — **completado**
 10. Admin: propiedades — **completado**
 11. Admin: hero y agentes — **completado**
-12. Admin: barrios, guía y testimonios
+12. Admin: barrios, guía y testimonios — **completado**
 13. Admin: consultas y ajustes
 14. Páginas comerciales y barrios públicos
 15. Guía pública, calculadora y SEO final
@@ -424,6 +424,102 @@ Se completaron dos secciones más rápidas del admin: gestión de destacados de 
 - Home, catálogo ni ficha pública.
 - Otras secciones del admin (Prompts 12–13).
 
+## Prompt 12 — Admin: Barrios, Guía y Testimonios
+
+Se completaron las tres secciones de contenido editorial del admin. Comparten el mismo patrón (texto + imagen + publicar/no publicar).
+
+**Rutas existentes (ya creadas en prompts anteriores, completadas en este):**
+
+| Ruta | Archivo | Función |
+| --- | --- | --- |
+| `/admin/barrios` | `app/admin/(app)/barrios/page.tsx` | Gestión de guía de barrios |
+| `/admin/guia` | `app/admin/(app)/guia/page.tsx` | Gestión de artículos y reportes |
+| `/admin/testimonios` | `app/admin/(app)/testimonios/page.tsx` | Gestión de testimonios de clientes |
+
+**Server actions (barrios/actions.ts):**
+
+- `guardarBarrio`: Crea o actualiza barrio con slug único automático. Campos: nombre, hero_image (MediaUploader), extracto, contenido (textarea simple), tips (una frase por línea), seo_title, meta_description, publicado.
+- `eliminarBarrio`: Elimina barrio con confirmación previa en UI.
+
+**Server actions (guia/actions.ts):**
+
+- `guardarArticulo`: Crea o actualiza artículo con slug único automático (editable a mano). Campos: título, extracto, contenido (textarea simple), categoría (Comprar/Vender/Invertir/Barrio/Tips), etiquetas, imagen_destacada (MediaUploader), seo_title, meta_description, estado (borrador/publicado). Soporta `es_reporte` y `archivo_pdf_url` (MediaUploader kind="pdf") para reportes descargables.
+- `eliminarArticulo`: Elimina artículo con confirmación previa en UI.
+
+**Server actions (testimonios/actions.ts):**
+
+- `guardarTestimonio`: Crea o actualiza testimonio. Campos: nombre, rol_ciudad, texto, foto_url (MediaUploader), propiedad_id (selector opcional de propiedades), destacado, publicado.
+- `eliminarTestimonio`: Elimina testimonio con confirmación previa en UI.
+
+**Componentes creados:**
+
+- `BarrioForm`: Formulario con ayuda visible: "Escribe como si le estuvieras contando a un amigo cómo es vivir en este barrio." Secciones: Información básica, Imagen destacada (MediaUploader kind="image" bucket="contenidos" pathPrefix="barrios/{slug}"), Contenido (textarea grande), Tips (textarea, una frase por línea), SEO, Estado.
+- `BarriosListado`: Grilla de tarjetas con miniatura, nombre, extracto, estado. Acciones: Editar, Eliminar. EmptyState con lista de barrios sugeridos (Viña del Mar, Reñaca, Recreo, Concón, Olmué, Quilpué, Peñablanca, Villa Alemana).
+- `ArticuloForm`: Formulario con secciones: Información básica (título + slug editable), Categoría y etiquetas, Imagen destacada (MediaUploader), Contenido (textarea grande), Reporte descargable (checkbox es_reporte + MediaUploader kind="pdf" condicional), SEO, Estado (borrador/publicado).
+- `ArticulosListado`: Grilla de tarjetas con miniatura, título, categoría, badges (Publicado/Borrador, Reporte), extracto. Acciones: Editar, Eliminar. EmptyState con descripción editorial.
+- `TestimonioForm`: Formulario con secciones: Información personal (nombre, rol_ciudad), Foto (MediaUploader kind="image" bucket="contenidos" pathPrefix="testimonios"), Testimonio (textarea), Propiedad relacionada (selector opcional), Estado (destacado, publicado).
+- `TestimoniosListado`: Grilla de tarjetas con foto, nombre, rol_ciudad, badges (Publicado/Borrador, Destacado), texto. Acciones: Editar, Eliminar. EmptyState con descripción.
+
+**Librerías actualizadas:**
+
+- `lib/admin.ts`: Ya incluía `getAdminBarrios()`, `getAdminArticulos()`, `getAdminTestimonios()` desde el Prompt 4.
+- `lib/admin-copy.ts`: Ya incluía las entradas en `ADMIN_NAV` para Barrios, Guía, Testimonios.
+
+**Correcciones:**
+
+- Se corrigió un error de sintaxis preexistente en `components/admin/ArticuloForm.tsx` (paréntesis extra en `useState` de `categoria`).
+
+**No se modificó:**
+
+- Sistema de autenticación existente.
+- Home, catálogo ni ficha pública.
+- Leads ni Ajustes (Prompt 13).
+
+## Prompt 13 — Admin: Consultas y Ajustes
+
+Se completó la gestión de leads y la configuración centralizada del sitio.
+
+**Rutas creadas:**
+
+| Ruta | Archivo | Función |
+| --- | --- | --- |
+| `/admin/leads` | `app/admin/(app)/leads/page.tsx` | Listado y gestión de consultas de clientes |
+| `/admin/ajustes` | `app/admin/(app)/ajustes/page.tsx` | Configuración general, calculadora y antes/después |
+
+**Server actions (leads/actions.ts):**
+
+- `cambiarEstadoLead`: Actualiza el estado de la consulta ("nuevo", "contactado", "cerrado").
+
+**Server actions (ajustes/actions.ts):**
+
+- `guardarGeneral`: Titulares de portada y datos de contacto general.
+- `guardarCalculadora`: Parámetros financieros (UF manual, comisión, gastos, pie, disclaimer).
+- `guardarComoTrabajamos`: Lista dinámica de pasos para el Home.
+- `guardarCasoPreparacion`: Crea o edita casos de Antes/Después con MediaUploader.
+- `eliminarCasoPreparacion`: Elimina caso con confirmación.
+
+**Componentes creados:**
+
+- `AdminLeadsClient`: Listado con filtros por tipo y estado. Muestra badge de notificación (Resend), fecha relativa, y botón directo a WhatsApp con mensaje pre-armado. Modal de detalle con toda la información del lead (incluyendo propiedad de origen si aplica).
+- `AjustesForm`: Formulario dividido en 4 secciones independientes. Cada sección guarda sus datos sin afectar a las demás, mejorando la UX operativa.
+- `MediaUploader`: (Ya existía) Se usa en Ajustes para las fotos de Antes/Después y en perfiles.
+
+**Librerías actualizadas:**
+
+- `lib/admin.ts`: Agregadas `getAdminSettings()` y `getAdminCasosPreparacion()`.
+- `app/admin/(app)/leads/page.tsx`: Convertida a Server Component que inyecta datos al cliente.
+
+**Funcionalidades clave:**
+
+- **Gestión de Leads**: Silvia e Ivannia pueden marcar qué consultas ya fueron atendidas y cuáles están cerradas, manteniendo el orden sin salir del admin.
+- **Configuración en un clic**: Cambio de titulares y parámetros de la calculadora reflejados al instante en el sitio público.
+- **Antes y Después**: Galería gestionable para mostrar el valor de la preparación ISL.
+
+**No se modificó:**
+
+- Sistema de autenticación existente.
+- Home, catálogo ni ficha pública (aunque consumen los nuevos ajustes).
+- Prompts 14-15 (pendientes).
 
 
 
