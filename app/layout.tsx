@@ -35,6 +35,30 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
       lang="es"
       className={`${cormorantGaramond.variable} ${inter.variable} h-full`}
     >
+      <head>
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{
+            __html: JSON.stringify({
+              "@context": "https://schema.org",
+              "@type": "Organization",
+              "name": "ISL Propiedades",
+              "description": "Corredora boutique de propiedades en Viña del Mar",
+              "url": "https://islpropiedades.cl",
+              "logo": "https://islpropiedades.cl/favicon.ico",
+              "address": {
+                "@type": "PostalAddress",
+                "addressLocality": "Viña del Mar",
+                "addressRegion": "Valparaíso",
+                "addressCountry": "CL",
+              },
+              "telephone": undefined,
+              "email": undefined,
+              "sameAs": [],
+            }),
+          }}
+        />
+      </head>
       <body className="min-h-full bg-isl-white antialiased">{children}</body>
     </html>
   );

@@ -521,5 +521,49 @@ Se completó la gestión de leads y la configuración centralizada del sitio.
 - Home, catálogo ni ficha pública (aunque consumen los nuevos ajustes).
 - Prompts 14-15 (pendientes).
 
+## Prompt 14 — Páginas comerciales y barrios públicos
+
+Se publicaron las páginas comerciales faltantes y la sección pública de barrios, construidas sobre el contenido ya cargado desde el admin (Prompts 12 y 13). Todo contenido es opcional: si no hay datos cargados, se omite con elegancia y sin huecos en el diseño.
+
+**Rutas creadas/actualizadas:**
+
+| Ruta | Archivo | Función |
+| --- | --- | --- |
+| `/nosotros` | `app/nosotros/page.tsx` | "La Mirada ISL", AgentCard del equipo, bloque "Cómo trabajamos" lee `site_settings.como_trabajamos` y se omite si está vacío |
+| `/vender` | `app/vender/page.tsx` | Beneficios del servicio de venta, "Deja tu casa lista" con pasos y galery antes/después condicional (lee `getCasosPreparacionPublicados()`), LeadForm con tipo="vender" |
+| `/tasacion` | `app/tasacion/page.tsx` | Explicación editorial de la tasación ISL, formulario de contacto con campos extra (tipo de propiedad, comuna, dormitorios, m²), LeadForm con tipo="tasacion" |
+| `/barrios` | `app/barrios/page.tsx` | Índice con componente `MapaBarrios` (SVG interactivo con zonas clickeables de Viña del Mar a Olmué), y grilla de 8 tarjetas de barrio |
+| `/barrios/[slug]` | `app/barrios/[slug]/page.tsx` | Hero, extracto, contenido, tips, lista de propiedades filtradas por comuna (match flexible sin distinción de tildes), EmptyState con CTA a alertas, generateMetadata |
+
+**Componente interactivo:**
+
+- `components/isl/MapaBarrios.tsx`: SVG ilustrativo con 8 zonas (Concón, Reñaca, Viña del Mar, Recreo, Quilpué, Villa Alemana, Peñablanca, Olmué). Hover/tap resalta zona y muestra nombre + conteo de propiedades. Click navega a `/barrios/[slug]`. Respetuoso con `prefers-reduced-motion` (transiciones deshabilitadas). Tooltip fijo en mobile.
+- `components/isl/GaleriaAntesDespues.tsx`: Reutilizado desde Prompt 12 para la sección "Deja tu casa lista".
+
+**Librerías reutilizadas:**
+
+- `lib/settings.ts` (`getSiteSettings()`) — datos de "Cómo trabajamos".
+- `lib/agentes.ts` (`getAgentesActivos()`) — AgentCard.
+- `lib/casos-preparacion.ts` (`getCasosPreparacionPublicados()`) — galería antes/después.
+- `lib/barrios.ts` (`getBarriosPublicados()`, `getBarrioBySlug()`) — contenido de barrios.
+- `lib/propiedades.ts` (`getPropiedadesPublicadas()`) — conteo y listado de propiedades por comuna.
+- `components/isl/LeadForm.tsx` — formulario de contacto reutilizable con `tipo` parametrizado.
+- `components/isl/EmptyState.tsx` — estado vacío para barrios sin propiedades.
+
+**Funcionalidades clave:**
+
+- Todas las páginas respetan `prefers-reduced-motion` y evitan animaciones innecesarias.
+- Match de comuna flexible (sin distinción de mayúsculas/tildes) entre `propiedades.comuna` y `barrios.nombre`.
+- `generateMetadata` implementado en `/barrios/[slug]` con `seo_title` y `meta_description`.
+- Páginas `/nosotros`, `/vender`, `/tasacion` y `/barrios` son estáticas (prerendered); `/barrios/[slug]` es dinámica.
+
+**No se modificó:**
+
+- Sistema de autenticación, admin, Home, catálogo, ficha pública, leads ni otras funcionalidades existentes.
+- Prompts 15 (pendiente).
+
+
+
+
 
 

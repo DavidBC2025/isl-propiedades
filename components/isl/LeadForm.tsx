@@ -11,9 +11,10 @@ type LeadFormProps = {
   hiddenFields?: string[];
   submitLabel?: string;
   className?: string;
+  onSuccess?: () => void;
 };
 
-export function LeadForm({ tipo, propiedadId, agenteId, extraFields, hiddenFields = [], submitLabel, className }: LeadFormProps) {
+export function LeadForm({ tipo, propiedadId, agenteId, extraFields, hiddenFields = [], submitLabel, className, onSuccess }: LeadFormProps) {
   const [status, setStatus] = useState<string | null>(null);
   const [isSending, setIsSending] = useState(false);
   const isHidden = (name: string) => hiddenFields.includes(name);
@@ -35,7 +36,10 @@ export function LeadForm({ tipo, propiedadId, agenteId, extraFields, hiddenField
       });
       const result = await response.json().catch(() => null) as { message?: string } | null;
       setStatus(response.ok ? "Gracias, te contactaremos pronto." : result?.message ?? "No pudimos enviar tu mensaje. Intenta de nuevo.");
-      if (response.ok) form.reset();
+      if (response.ok) {
+        form.reset();
+        onSuccess?.();
+      }
     } catch {
       setStatus("No pudimos enviar tu mensaje. Intenta de nuevo.");
     } finally {
