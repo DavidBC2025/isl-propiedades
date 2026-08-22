@@ -1,47 +1,49 @@
-import { cache } from "react";
+import { getSiteSettings } from "@/lib/settings";
 
-/**
- * Obtiene el valor actual de la UF.
- * - Primero intenta obtenerlo desde la API pública de mindicador.cl (con revalidación de 1 hora).
- * - Si la API falla, usa el valor manual configurado en site_settings (uf_valor_manual).
- * - Si ninguna está disponible, lanza un error para que la UI lo maneje.
- */
-export async function getValorUF(): Promise<{ valor: number; fuente: "api" | "manual"; fecha: string }> {
-  // Intento 1: API pública de mindicador.cl
-  try {
-    const res = await fetch("https://mindicador.cl/api/uf", { next: { revalidate: 3600 } });
-    if (res.ok) {
-      const data = await res.json();
-      const valor = Number(data?.serie?.[0]?.valor);
-      const fecha = data?.serie?.[0]?.fecha ?? new Date().toISOString();
-      if (Number.isFinite(valor) && valor > 0) {
-        return { valor, fuente: "api", fecha };
-      }
-    }
-  } catch {
-    // Falló la API, intentamos con el valor manual
-  }
+export type UFFuente = "api" | "manual";
 
-  // Intento 2: Valor manual desde site_settings
-  try {
-    const { getSiteSettings } = await import("@/lib/settings");
-    const settings = await getSiteSettings();
-    if (settings?.uf_valor_manual && settings.uf_valor_manual > 0) {
-      return {
-        valor: settings.uf_valor_manual,
-        fuente: "manual",
-        fecha: settings.uf_actualizado_en ?? new Date().toISOString(),
-      };
-    }
-  } catch {
-    // No hay valor manual disponible
-  }
-
-  // Si nada funciona, retornamos un error
-  throw new Error("No se pudo obtener el valor de la UF");
+export interface ValorUF {
+  valor: number;
+  fuente: UFFuente;
+  fecha: string;
 }
 
-/**
- * Versión cacheada para uso en componentes Server
- */
-export const getCachedValorUF = cache(getValorUF);
+export async function getValorUF(): Promise<ValorUF> {
+  try {
+    const response = await fetch("https://mindicador.cl/api/uf", {
+      next: { revalidate: 3600 }, // 1 hora
+    });
+    if (!response.ok) throw new Error("API falló");
+
+    const data = await response.json() as { serie: Array<{ valor: number; fecha: string }> };
+    const hoy = data.serie[0];
+    if (!hoy?.valor) throw new Error("Sin valor en API");
+
+    return {
+      valor: hoy.valor,
+      fuente: "api",
+      fecha: hoy.fecha,
+    };
+  } catch {
+    // Fallback a valor manual configurado
+    try {
+      const settings = await getSiteSettings();
+      if (settings?.uf_valor_manual) {
+        return {
+          valor: settings.uf_valor_manual,
+          fuente: "manual",
+          fecha: new Date().toISOString(),
+        };
+      }
+    } catch {
+      // Settings fallan, sigue a modo manual
+    }
+
+    // Último recurso: modo manual (valor 0 indica que el usuario debe ingresarlo)
+    return {
+      valor: 0,
+      fuente: "manual",
+      fecha: new Date().toISOString(),
+    };
+  }
+}

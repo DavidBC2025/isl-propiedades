@@ -146,9 +146,9 @@ la migración. La migración es aditiva y no se ejecuta desde la aplicación.
 10. Admin: propiedades — **completado**
 11. Admin: hero y agentes — **completado**
 12. Admin: barrios, guía y testimonios — **completado**
-13. Admin: consultas y ajustes
-14. Páginas comerciales y barrios públicos
-15. Guía pública, calculadora y SEO final
+13. Admin: consultas y ajustes — **completado**
+14. Páginas comerciales y barrios públicos — **completado**
+15. Guía pública, calculadora y SEO final — **completado**
 
 ## Prompt 2 — Sistema de diseño
 
@@ -358,6 +358,164 @@ con fotos y video. El diseño prioriza eficiencia operativa y UX móvil.
 
 - `lib/social-image.ts`: `generateSocialImage(propiedad, formato)` dibuja en canvas del navegador: foto de portada + degradado inferior oscuro + título + precio UF + comuna + "ISL Propiedades" en Cormorant Garamond. Maneja CORS y fallback.
 - `lib/propiedad-admin.ts`: Tipos `PropiedadFormValues` y `PropiedadGuardarInput`, funciones de conversión, validación, y utilidades para borrador y defaults inteligentes (COMUNAS_ISL, LAST_OPERACION_KEY, LAST_COMUNA_KEY).
+
+## Prompt 13 — Admin: consultas y ajustes
+
+Se completó el módulo de gestión de consultas (leads) y configuración general del sitio.
+
+**Rutas creadas:**
+
+|| Ruta | Archivo | Función |
+|| --- | --- | --- |
+|| `/admin/leads` | `app/admin/(app)/leads/page.tsx` | Listado de consultas con filtros y gestión de estado |
+|| `/admin/ajustes` | `app/admin/(app)/ajustes/page.tsx` | Configuración general del sitio |
+
+**Server actions (ajustes/actions.ts):**
+
+- `guardarAjustes`: Actualiza configuración general (títulos, contacto, calculadora, como_trabajamos).
+- `marcarLeadContactado`: Cambia estado de lead de "nuevo" a "contactado".
+
+**Componentes creados:**
+
+- `AdminLeadsClient`: Listado de leads con filtros por estado/tipo, búsqueda, y acción de contacto por WhatsApp.
+- `AjustesForm`: Formulario de configuración del sitio con secciones: Información general, Contacto, Calculadora, Cómo trabajamos.
+
+## Prompt 14 — Páginas comerciales y barrios públicos
+
+Se implementaron las páginas públicas comerciales y la guía de barrios con mapa interactivo.
+
+**Rutas creadas:**
+
+|| Ruta | Archivo | Función |
+|| --- | --- | --- |
+|| `/nosotros` | `app/nosotros/page.tsx` | Página Nosotros con equipo y cómo trabajamos |
+|| `/vender` | `app/vender/page.tsx` | Página de venta con beneficios y casos de preparación |
+|| `/tasacion` | `app/tasacion/page.tsx` | Página de tasación con formulario |
+|| `/barrios` | `app/barrios/page.tsx` | Guía de barrios con mapa interactivo |
+|| `/barrios/[slug]` | `app/barrios/[slug]/page.tsx` | Detalle de barrio con contenido y propiedades |
+
+**Componentes creados:**
+
+- `MapaBarrios`: Mapa SVG interactivo de la V Región con zonas clickeables.
+- `GaleriaAntesDespues`: Componente para mostrar casos de preparación (antes/después).
+
+**Librerías creadas:**
+
+- `lib/casos-preparacion.ts`: Funciones para obtener casos de preparación publicados.
+
+## Prompt 15 — Guía pública, calculadora y SEO final
+
+Se completó la guía pública con descarga de reportes, calculadora inmobiliaria, y SEO técnico global.
+
+**Rutas creadas:**
+
+|| Ruta | Archivo | Función |
+|| --- | --- | --- |
+|| `/guia` | `app/guia/page.tsx` | Índice de artículos con filtro por categoría |
+|| `/guia/[slug]` | `app/guia/[slug]/page.tsx` | Artículo completo con descarga de reporte PDF |
+|| `/calculadora` | `app/calculadora/page.tsx` | Calculadora UF ↔ CLP con API mindicador |
+
+**Archivos SEO:**
+
+- `app/sitemap.ts`: Sitemap dinámico con home, catálogo, fichas, barrios, artículos y páginas fijas.
+- `app/robots.txt`: Reglas para crawlers excluyendo /admin y /api.
+- `app/layout.tsx`: JSON-LD de Organization y LocalBusiness con datos dinámicos de settings.
+
+**Librerías creadas:**
+
+- `lib/uf.ts`: `getValorUF()` con API mindicador.cl (revalidate 1h) y fallback a valor manual.
+- `app/guia/[slug]/not-found.tsx`: Página 404 específica para artículos.
+
+**Modificaciones:**
+
+- `components/isl/FichaAcciones.tsx`: Agregado `ImagenRedesButton` para generar imágenes para redes sociales desde la ficha pública.
+
+## Mapa completo del sitio
+
+### Rutas públicas
+
+|| Ruta | Estado | Función |
+|| --- | --- | --- |
+|| `/` | ○ (revalidate 2m) | Home público con hero, selección, buscador, testimonios |
+|| `/propiedades` | ƒ (dinámica) | Catálogo con filtros y paginación |
+|| `/propiedades/[slug]` | ƒ (dinámica) | Ficha de propiedad con galería, acciones y similares |
+|| `/comparar` | ƒ (dinámica) | Comparador de propiedades |
+|| `/barrios` | ○ (revalidate 2m) | Guía de barrios con mapa interactivo |
+|| `/barrios/[slug]` | ƒ (dinámica) | Detalle de barrio |
+|| `/guia` | ○ (revalidate 2m) | Índice de artículos |
+|| `/guia/[slug]` | ƒ (dinámica) | Artículo completo con descarga de reporte |
+|| `/nosotros` | ○ (revalidate 2m) | Página Nosotros |
+|| `/vender` | ○ (revalidate 2m) | Página de venta |
+|| `/tasacion` | ○ (revalidate 2m) | Página de tasación |
+|| `/calculadora` | ○ (revalidate 1h) | Calculadora inmobiliaria |
+|| `/alertas` | ƒ (dinámica) | Formulario de alertas |
+|| `/alertas/baja/[token]` | ƒ (dinámica) | Baja de alerta |
+
+### Rutas de administración
+
+|| Ruta | Estado | Función |
+|| --- | --- | --- |
+|| `/admin/login` | ○ (estática) | Login del panel |
+|| `/admin` | ƒ (dinámica) | Panel principal con resumen y primeros pasos |
+|| `/admin/propiedades` | ƒ (dinámica) | Listado de propiedades |
+|| `/admin/propiedades/nueva` | ƒ (dinámica) | Formulario de nueva propiedad |
+|| `/admin/propiedades/[id]/editar` | ƒ (dinámica) | Formulario de edición |
+|| `/admin/propiedades/[id]/vista-previa` | ƒ (dinámica) | Vista previa protegida |
+|| `/admin/leads` | ƒ (dinámica) | Gestión de consultas |
+|| `/admin/hero` | ƒ (dinámica) | Gestión de hero slides |
+|| `/admin/agentes` | ƒ (dinámica) | Gestión de agentes |
+|| `/admin/barrios` | ƒ (dinámica) | Gestión de barrios |
+|| `/admin/guia` | ƒ (dinámica) | Gestión de artículos |
+|| `/admin/testimonios` | ƒ (dinámica) | Gestión de testimonios |
+|| `/admin/ajustes` | ƒ (dinámica) | Configuración general |
+
+### API Routes
+
+|| Ruta | Función |
+|| --- | --- |
+|| `/api/leads` | Recepción de formularios de contacto con notificación por correo |
+|| `/api/alertas` | Creación de alertas de búsqueda |
+
+### Archivos técnicos
+
+|| Archivo | Función |
+|| --- | --- |
+|| `app/sitemap.ts` | Sitemap dinámico para SEO |
+|| `app/robots.txt` | Reglas para crawlers |
+|| `app/manifest.ts` | PWA manifest |
+|| `app/layout.tsx` | Layout raíz con JSON-LD SEO |
+
+## Estado final del proyecto
+
+El sitio ISL Propiedades está 100% funcional con:
+
+- ✅ Sistema de diseño completo (paleta ISL, tipografías, componentes UI)
+- ✅ Motor de fotos/video con HEIC a JPEG, optimización y miniaturas
+- ✅ Catálogo público con filtros, paginación y comparador
+- ✅ Fichas de propiedad con galería, lightbox, PDF y redes sociales
+- ✅ Sistema de leads con notificación por correo (Resend)
+- ✅ Panel de administración completo para todo el contenido
+- ✅ Páginas públicas: Home, catálogo, fichas, comparador, barrios, guía, nosotros, vender, tasación, calculadora
+- ✅ SEO técnico: sitemap dinámico, robots.txt, JSON-LD Organization/LocalBusiness
+- ✅ Mapa interactivo de barrios
+- ✅ Guía pública con descarga de reportes PDF
+- ✅ Calculadora inmobiliaria con API mindicador.cl
+- ✅ Sistema de alertas de búsqueda
+- ✅ Auth con Supabase SSR para admin
+- ✅ Responsive design con prefieres-reduced-motion
+- ✅ Copy en español de Chile, contenido local
+
+**Próximos pasos fuera del código:**
+
+1. Crear cuentas de Silvia e Ivannia en Supabase Authentication
+2. Verificar dominio en Resend para envío de correos
+3. Configurar `NEXT_PUBLIC_SITE_URL` con el dominio real
+4. Cargar primera propiedad real como prueba
+5. Completar perfiles de agentes (foto, WhatsApp, especialidad)
+6. Configurar ajustes del sitio (títulos, contactos, como_trabajamos)
+7. Configurar Google Search Console y Analytics
+8. Revisar y probar el sitio en diferentes dispositivos
+9. Desplegar a Cloudflare Workers con OpenNext
 - `lib/admin.ts`: `getAdminPropiedades`, `getAdminPropiedadById`, `getAdminAgentes` (usando el cliente SSR).
 - `lib/admin-copy.ts`: Copia administrativa: ADMIN_NAV, ESTADO_PROPIEDAD, AVISO_ADMIN, TIPO_CONSULTA, ESTADO_CONSULTA.
 

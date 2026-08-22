@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Cormorant_Garamond, Inter } from "next/font/google";
 import "./globals.css";
+import { getSiteSettings } from "@/lib/settings";
 
 const cormorantGaramond = Cormorant_Garamond({
   variable: "--font-isl-serif",
@@ -29,7 +30,50 @@ export const metadata: Metadata = {
   },
 };
 
-export default function RootLayout({ children }: LayoutProps<"/">) {
+async function getJsonLd() {
+  const settings = await getSiteSettings();
+  const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || "https://islpropiedades.cl";
+
+  const organizationData = {
+    "@context": "https://schema.org",
+    "@type": "Organization",
+    "name": "ISL Propiedades",
+    "description": "Corredora boutique de propiedades en Viña del Mar",
+    "url": baseUrl,
+    "logo": `${baseUrl}/favicon.ico`,
+    "address": {
+      "@type": "PostalAddress",
+      "addressLocality": "Viña del Mar",
+      "addressRegion": "Valparaíso",
+      "addressCountry": "CL",
+    },
+    "telephone": settings?.whatsapp_general || undefined,
+    "email": settings?.email_general || undefined,
+    "sameAs": [],
+  };
+
+  const localBusinessData = {
+    "@context": "https://schema.org",
+    "@type": "LocalBusiness",
+    "name": "ISL Propiedades",
+    "description": "Corredora boutique de propiedades en Viña del Mar",
+    "url": baseUrl,
+    "telephone": settings?.whatsapp_general || undefined,
+    "email": settings?.email_general || undefined,
+    "address": {
+      "@type": "PostalAddress",
+      "addressLocality": "Viña del Mar",
+      "addressRegion": "Valparaíso",
+      "addressCountry": "CL",
+    },
+  };
+
+  return JSON.stringify([organizationData, localBusinessData]);
+}
+
+export default async function RootLayout({ children }: LayoutProps<"/">) {
+  const jsonLd = await getJsonLd();
+
   return (
     <html
       lang="es"
@@ -38,25 +82,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
       <head>
         <script
           type="application/ld+json"
-          dangerouslySetInnerHTML={{
-            __html: JSON.stringify({
-              "@context": "https://schema.org",
-              "@type": "Organization",
-              "name": "ISL Propiedades",
-              "description": "Corredora boutique de propiedades en Viña del Mar",
-              "url": "https://islpropiedades.cl",
-              "logo": "https://islpropiedades.cl/favicon.ico",
-              "address": {
-                "@type": "PostalAddress",
-                "addressLocality": "Viña del Mar",
-                "addressRegion": "Valparaíso",
-                "addressCountry": "CL",
-              },
-              "telephone": undefined,
-              "email": undefined,
-              "sameAs": [],
-            }),
-          }}
+          dangerouslySetInnerHTML={{ __html: jsonLd }}
         />
       </head>
       <body className="min-h-full bg-isl-white antialiased">{children}</body>

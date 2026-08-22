@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { ButtonISL } from "@/components/isl/ButtonISL";
+import { ImagenRedesButton } from "@/components/admin/ImagenRedesButton";
 import { formatUF } from "@/lib/format";
 import { portadaImagen } from "@/lib/ficha";
 import { generateFichaPDF } from "@/lib/pdf-ficha";
@@ -18,6 +19,7 @@ export function FichaAcciones({ propiedad, agente }: FichaAccionesProps) {
   const { isSelected, toggle, notice } = useComparador();
   const [pdfStatus, setPdfStatus] = useState<string | null>(null);
   const [copyStatus, setCopyStatus] = useState<string | null>(null);
+  const [socialStatus, setSocialStatus] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
   const selected = isSelected(propiedad.slug);
   const cover = portadaImagen(propiedad.imagenes);
@@ -67,6 +69,7 @@ export function FichaAcciones({ propiedad, agente }: FichaAccionesProps) {
         <ButtonISL type="button" variant="primary" onClick={onPdf} disabled={busy}>
           {busy ? "Preparando PDF…" : "Descargar ficha PDF"}
         </ButtonISL>
+        <ImagenRedesButton propiedad={propiedad} onDone={setSocialStatus} className="rounded-sm border border-isl-black/20 bg-isl-white px-5 py-3 text-xs font-medium uppercase tracking-[0.12em] text-isl-black hover:bg-isl-offwhite disabled:opacity-50" />
         <ButtonISL type="button" variant={selected ? "gold" : "outline"} onClick={onCompare}>
           {selected ? "Quitar de comparar" : "Agregar a comparar"}
         </ButtonISL>
@@ -75,6 +78,7 @@ export function FichaAcciones({ propiedad, agente }: FichaAccionesProps) {
       </div>
       {compareMessage ? <p role="status" className="text-sm text-isl-black/70">{compareMessage === COMPARE_NOTICE ? COMPARE_NOTICE : compareMessage}</p> : null}
       {pdfStatus ? <p role="status" className="text-sm text-isl-black/70">{pdfStatus}</p> : null}
+      {socialStatus ? <p role="status" className="text-sm text-isl-black/70">{socialStatus}</p> : null}
       {copyStatus ? <p role="status" className="text-sm text-isl-black/70">{copyStatus}</p> : null}
     </div>
   );

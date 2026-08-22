@@ -55,8 +55,23 @@ export default async function GuiaSlugPage({ params }: GuiaSlugProps) {
     tips: "Tips",
   }[articulo.categoria ?? "tips"];
 
+  // JSON-LD Article
+  const jsonLd = {
+    "@context": "https://schema.org",
+    "@type": "Article",
+    headline: articulo.titulo,
+    description: articulo.extracto || articulo.meta_description || undefined,
+    image: articulo.imagen_destacada || undefined,
+    datePublished: articulo.fecha_publicacion ? new Date(articulo.fecha_publicacion).toISOString() : undefined,
+    author: {
+      "@type": "Organization",
+      name: "ISL Propiedades",
+    },
+  };
+
   return (
     <article className="pb-24 pt-32">
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }} />
       <Container>
         {/* Hero del Artículo */}
         <header className="mb-16 text-center">
