@@ -1,215 +1,171 @@
 import type { Metadata } from "next";
-import { ArticleCard } from "@/components/isl/ArticleCard";
+import Link from "next/link";
 import { Container } from "@/components/isl/Container";
-import { EmptyState } from "@/components/isl/EmptyState";
-import { HomeHero } from "@/components/isl/HomeHero";
-import { LeadForm } from "@/components/isl/LeadForm";
-import { CompareBar } from "@/components/isl/CompareBar";
-import { ListingCard } from "@/components/isl/ListingCard";
-import { QuickSearch } from "@/components/isl/QuickSearch";
-import { SectionTitle } from "@/components/isl/SectionTitle";
-import { SiteFooter } from "@/components/isl/SiteFooter";
-import { SiteHeader } from "@/components/isl/SiteHeader";
-import { TestimoniosCarousel } from "@/components/isl/TestimoniosCarousel";
-import { ButtonISL } from "@/components/isl/ButtonISL";
-import { getAgentesActivos } from "@/lib/agentes";
-import { getArticulosPublicados } from "@/lib/articulos";
-import { buildHomeHeroSlides, POR_QUE_ISL } from "@/lib/home";
-import { getHeroSlides } from "@/lib/hero";
-import { getPropiedadPrincipal, getPropiedadesPublicadas } from "@/lib/propiedades";
-import { getSiteSettings } from "@/lib/settings";
-import { HOME_DESCRIPTION_FALLBACK } from "@/lib/site";
-import { getTestimoniosPublicados } from "@/lib/testimonios";
+import { getPropiedadesPublicadas } from "@/lib/propiedades";
+import { getBarriosPublicados } from "@/lib/barrios";
+import { formatUF } from "@/lib/format";
 
-export const revalidate = 120;
+export const metadata: Metadata = {
+  title: "ISL Propiedades | Corretaje Boutique & Inversiones en Viña del Mar",
+  description: "Plataforma inmobiliaria de alta gama en Viña del Mar, Concón y la Región de Valparaíso. Gestión exclusiva, tasaciones y propiedades de lujo.",
+};
 
-export async function generateMetadata(): Promise<Metadata> {
-  const settings = await getSiteSettings();
-  const description = settings?.home_subheadline?.trim() || HOME_DESCRIPTION_FALLBACK;
-
-  return {
-    title: {
-      absolute: "ISL Propiedades | Corredora boutique en Viña del Mar",
-    },
-    description,
-  };
-}
-
-export default async function Home() {
-  const [settings, heroSlides, propiedadPrincipal, propiedades, articulos, testimonios, agentes] = await Promise.all([
-    getSiteSettings(),
-    getHeroSlides(),
-    getPropiedadPrincipal(),
-    getPropiedadesPublicadas({ limit: 6 }),
-    getArticulosPublicados(),
-    getTestimoniosPublicados(),
-    getAgentesActivos(),
+export default async function HomePage() {
+  const [propiedades, barrios] = await Promise.all([
+    getPropiedadesPublicadas({ pageSize: 6 }),
+    getBarriosPublicados(),
   ]);
 
-  const slides = buildHomeHeroSlides(heroSlides, propiedadPrincipal, settings);
-  const seleccion = propiedades.slice(0, 6);
-  const guia = articulos.slice(0, 3);
-  const customWhy = settings?.como_trabajamos;
-  const whyPoints = Array.isArray(customWhy) && customWhy.length > 0 ? customWhy.slice(0, 4) : POR_QUE_ISL;
-  const silvia = agentes.find((agente) => /silvia/i.test(`${agente.nombre} ${agente.apellido ?? ""}`));
-  const ivannia = agentes.find((agente) => /ivannia/i.test(`${agente.nombre} ${agente.apellido ?? ""}`));
-  const fundadoras = [
-    silvia ?? { id: "silvia", nombre: "Silvia", apellido: null, foto_url: null },
-    ivannia ?? { id: "ivannia", nombre: "Ivannia", apellido: null, foto_url: null },
-  ];
-
   return (
-    <>
-      <a href="#contenido" className="sr-only focus:not-sr-only focus:absolute focus:left-4 focus:top-4 focus:z-50 focus:bg-isl-white focus:px-3 focus:py-2">
-        Saltar al contenido
-      </a>
-      <SiteHeader variant="overlay" whatsapp={settings?.whatsapp_general} />
-      <HomeHero slides={slides} />
+    <div className="bg-isl-white text-isl-black selection:bg-isl-gold selection:text-white">
+      {/* 1. HERO / SLIDESHOW DE IMPACTO (Pantalla completa inicial) */}
+      <section className="relative h-screen w-full flex items-center justify-center overflow-hidden bg-isl-black">
+        {/* Imagen de fondo con escala y fundido suave */}
+        <div 
+          className="absolute inset-0 bg-cover bg-center opacity-60 scale-105 transition-transform duration-1000 ease-out"
+          style={{ backgroundImage: `url('/images/hero-bg.jpg')` }}
+        />
+        <div className="absolute inset-0 bg-gradient-to-t from-isl-black via-isl-black/40 to-transparent" />
 
-      <main id="contenido">
-        <section className="isl-section bg-isl-white">
-          <Container>
-            <SectionTitle
-              subtitle="Selección"
-              title="Selección curada de espacios excepcionales"
-              className="max-w-2xl"
-            />
-            {seleccion.length > 0 ? (
-              <div className="mt-12 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-                {seleccion.map((propiedad) => (
-                  <ListingCard key={propiedad.id} propiedad={propiedad} enableCompare={true} />
-                ))}
-              </div>
-            ) : (
-              <EmptyState
-                className="mt-12"
-                title="Estamos preparando nuestra primera selección"
-                description="Pronto vas a ver acá casas y departamentos que Silvia e Ivannia eligen con calma, en Viña del Mar y alrededores."
-                ctaLabel="Quiero vender"
-                ctaHref="/vender"
-              />
-            )}
-          </Container>
-        </section>
+        <div className="relative z-10 max-w-5xl mx-auto px-6 text-center text-white animate-fade-in">
+          <p className="text-xs font-medium uppercase tracking-[0.3em] text-isl-gold mb-4">
+            Corretaje Boutique • Viña del Mar
+          </p>
+          <h1 className="font-serif text-5xl md:text-7xl font-normal tracking-tight mb-6 leading-tight">
+            Exclusividad y Legado Inmobiliario
+          </h1>
+          <p className="font-light text-lg md:text-xl text-white/80 max-w-2xl mx-auto mb-10 tracking-wide">
+            Especialistas en propiedades residenciales de alta gama, gestión de activos y asesoría patrimonial personalizada.
+          </p>
+          <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
+            <Link 
+              href="/propiedades"
+              className="w-full sm:w-auto bg-isl-gold text-white px-8 py-4 text-xs font-medium uppercase tracking-[0.2em] hover:bg-white hover:text-isl-black transition-all duration-300"
+            >
+              Explorar Propiedades
+            </Link>
+            <Link 
+              href="/tasacion"
+              className="w-full sm:w-auto border border-white/40 text-white px-8 py-4 text-xs font-medium uppercase tracking-[0.2em] hover:border-isl-gold hover:text-isl-gold transition-all duration-300"
+            >
+              Solicitar Tasación
+            </Link>
+          </div>
+        </div>
+      </section>
 
-        <section className="isl-section bg-isl-offwhite">
-          <Container>
-            <SectionTitle subtitle="Buscar" title="Encuentra por comuna, tipo y UF" className="max-w-2xl" />
-            <div className="mt-10">
-              <QuickSearch />
+      {/* 2. SECCIÓN: ESTADÍSTICAS Y TRAYECTORIA (Efecto Parallax visual) */}
+      <section className="relative py-32 bg-fixed bg-cover bg-center overflow-hidden" style={{ backgroundImage: `url('/images/stats-bg.jpg')` }}>
+        <div className="absolute inset-0 bg-isl-black/75 backdrop-blur-[2px]" />
+        
+        <Container className="relative z-10">
+          <div className="text-center max-w-3xl mx-auto mb-20">
+            <p className="text-xs font-medium uppercase tracking-[0.25em] text-isl-gold mb-3">Por qué elegirnos</p>
+            <h2 className="font-serif text-4xl md:text-5xl text-white font-normal">Excelencia Comprobada</h2>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-12 text-center text-white">
+            <div className="p-8 border-b md:border-b-0 md:border-r border-white/10">
+              <p className="font-serif text-5xl md:text-6xl text-isl-gold mb-2 font-light">+ UF 500k</p>
+              <p className="text-xs uppercase tracking-[0.2em] text-white/70">En gestión y ventas exclusivas</p>
             </div>
-          </Container>
-        </section>
+            <div className="p-8 border-b md:border-b-0 md:border-r border-white/10">
+              <p className="font-serif text-5xl md:text-6xl text-isl-gold mb-2 font-light">100%</p>
+              <p className="text-xs uppercase tracking-[0.2em] text-white/70">Compromiso y asesoría directa</p>
+            </div>
+            <div className="p-8">
+              <p className="font-serif text-5xl md:text-6xl text-isl-gold mb-2 font-light">V Región</p>
+              <p className="text-xs uppercase tracking-[0.2em] text-white/70">Viña del Mar, Concón e Interior</p>
+            </div>
+          </div>
+        </Container>
+      </section>
 
-        <section className="isl-section bg-isl-white">
-          <Container className="grid items-start gap-12 lg:grid-cols-2">
+      {/* 3. SECCIÓN: PROPIEDADES DESTACADAS (Carrusel / Grilla fluida) */}
+      <section className="py-32 bg-isl-offwhite">
+        <Container>
+          <div className="flex flex-col md:flex-row md:items-end justify-between mb-16">
             <div>
-              <SectionTitle subtitle="La mirada ISL" title="Dos corredoras, un mismo criterio" />
-              <div className="mt-8 space-y-5 text-base leading-7 text-isl-black/80">
-                <p>
-                  ISL nació en Viña del Mar con Silvia e Ivannia. No somos una vitrina anónima: somos dos personas que miran la casa, el barrio y a quienes van a vivirla.
-                </p>
-                <p>
-                  Trabajamos con cercanía y sin teatro. Te decimos lo que vemos, te acompañamos en las visitas y cuidamos el ritmo de una decisión que no se toma a la ligera.
-                </p>
-              </div>
+              <p className="text-xs font-medium uppercase tracking-[0.25em] text-isl-gold mb-2">Portafolio</p>
+              <h2 className="font-serif text-4xl md:text-5xl text-isl-black font-normal">Propiedades Destacadas</h2>
             </div>
-            <div className="grid gap-4 sm:grid-cols-2">
-              {fundadoras.map((persona) => (
-                <article key={persona.id} className="overflow-hidden rounded-sm bg-isl-offwhite">
-                  <div className="aspect-[4/5] bg-[linear-gradient(145deg,#E8DCC8,#F7F7F5)]">
-                    {persona.foto_url ? (
-                      <img src={persona.foto_url} alt={persona.nombre} className="size-full object-cover" />
-                    ) : (
-                      <div className="flex size-full items-end p-5">
-                        <span className="font-serif text-4xl text-isl-black/50">{persona.nombre}</span>
-                      </div>
-                    )}
+            <Link 
+              href="/propiedades"
+              className="mt-6 md:mt-0 text-xs font-medium uppercase tracking-[0.2em] text-isl-black hover:text-isl-gold transition-colors inline-flex items-center gap-2"
+            >
+              Ver todo el catálogo <span className="text-lg">→</span>
+            </Link>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+            {propiedades.map((p) => (
+              <Link 
+                key={p.id} 
+                href={`/propiedades/${p.slug}`}
+                className="group block bg-isl-white border border-isl-black/5 overflow-hidden transition-all duration-500 hover:-translate-y-1 hover:shadow-xl"
+              >
+                <div className="aspect-[4/3] overflow-hidden bg-isl-champagne/20 relative">
+                  {p.imagenes?.[0]?.url ? (
+                    <img
+                      src={p.imagenes[0].url}
+                      alt={p.titulo}
+                      className="size-full object-cover transition-transform duration-700 group-hover:scale-105"
+                    />
+                  ) : (
+                    <div className="flex size-full items-center justify-center text-isl-black/30 font-serif">Sin imagen</div>
+                  )}
+                  <div className="absolute top-4 left-4 bg-isl-black/80 text-white px-3 py-1 text-[10px] uppercase tracking-widest font-medium">
+                    {p.operacion}
                   </div>
-                </article>
-              ))}
-            </div>
-          </Container>
-        </section>
+                </div>
+                <div className="p-6">
+                  <p className="text-xs uppercase tracking-widest text-isl-gold mb-1">{p.comuna}</p>
+                  <h3 className="font-serif text-xl text-isl-black mb-3 line-clamp-1 group-hover:text-isl-gold transition-colors">
+                    {p.titulo}
+                  </h3>
+                  <p className="font-serif text-lg font-medium text-isl-black">
+                    {formatUF(p.precio_uf)}
+                  </p>
+                </div>
+              </Link>
+            ))}
+          </div>
+        </Container>
+      </section>
 
-        <section className="isl-section bg-isl-offwhite">
-          <Container>
-            <SectionTitle subtitle="Por qué ISL" title="Por qué trabajar con nosotras" className="max-w-2xl" />
-            <div className="mt-12 grid gap-8 md:grid-cols-2">
-              {whyPoints.map((punto) => (
-                <article key={punto.titulo} className="border-t border-isl-black/15 pt-6">
-                  <h3 className="font-serif text-2xl font-normal text-isl-black">{punto.titulo}</h3>
-                  <p className="mt-3 text-sm leading-6 text-isl-black/70">{punto.texto}</p>
-                </article>
-              ))}
-            </div>
-          </Container>
-        </section>
-
-        <section className="relative isolate overflow-hidden bg-isl-black">
-          <div className="isl-hero-overlay absolute inset-0" aria-hidden="true" />
-          <div className="absolute inset-0 bg-[radial-gradient(circle_at_20%_20%,rgba(198,168,124,0.28),transparent_40%),linear-gradient(135deg,#0A0A0A,#1c1814)]" aria-hidden="true" />
-          <Container className="relative z-10 py-24 md:py-32">
-            <p className="text-xs font-medium uppercase tracking-[0.2em] text-isl-gold">Vender</p>
-            <h2 className="mt-4 max-w-xl font-serif text-4xl font-normal text-isl-white md:text-5xl">¿Estás pensando en vender?</h2>
-            <p className="mt-5 max-w-lg text-base leading-7 text-isl-white/80">
-              Conversemos con calma. Te contamos cómo preparamos la propiedad y cómo acompañamos cada visita.
+      {/* 4. SECCIÓN: SERVICIOS Y BARRIOS (Recorrido narrativo) */}
+      <section className="py-32 bg-isl-white">
+        <Container>
+          <div className="max-w-3xl mx-auto text-center mb-20">
+            <p className="text-xs font-medium uppercase tracking-[0.25em] text-isl-gold mb-3">Experiencia Local</p>
+            <h2 className="font-serif text-4xl md:text-5xl text-isl-black font-normal mb-6">Nuestros Barrios</h2>
+            <p className="text-isl-black/70 font-serif text-lg">
+              Conoce las ubicaciones más cotizadas de la región y descubre dónde se encuentra tu próximo hogar o inversión.
             </p>
-            <div className="mt-8">
-              <ButtonISL href="/vender" variant="gold">Quiero vender</ButtonISL>
-            </div>
-          </Container>
-        </section>
+          </div>
 
-        <section className="isl-section bg-isl-white">
-          <Container>
-            <SectionTitle subtitle="Guía ISL" title="Notas para comprar, vender y habitar mejor" className="max-w-2xl" />
-            {guia.length > 0 ? (
-              <div className="mt-12 grid gap-6 md:grid-cols-3">
-                {guia.map((articulo) => (
-                  <ArticleCard key={articulo.id} articulo={articulo} />
-                ))}
-              </div>
-            ) : (
-              <EmptyState
-                className="mt-12"
-                title="La guía se está escribiendo"
-                description="Pronto vas a encontrar acá notas claras sobre comprar, vender y elegir barrio en Viña del Mar."
-                ctaLabel="Ver propiedades"
-                ctaHref="/propiedades"
-              />
-            )}
-          </Container>
-        </section>
-
-        {testimonios.length > 0 ? (
-          <section className="isl-section bg-isl-offwhite">
-            <Container>
-              <SectionTitle subtitle="Voces" title="Lo que cuentan quienes ya caminaron con nosotras" className="mx-auto max-w-2xl text-center" />
-              <div className="mt-12">
-                <TestimoniosCarousel testimonios={testimonios} />
-              </div>
-            </Container>
-          </section>
-        ) : null}
-
-        <section className="isl-section bg-isl-white">
-          <Container className="grid items-start gap-10 lg:grid-cols-2">
-            <SectionTitle
-              subtitle="Novedades"
-              title="Entérate cuando aparezca una propiedad que vale la pena"
-            />
-            <LeadForm
-              tipo="newsletter"
-              hiddenFields={["nombre", "telefono", "mensaje"]}
-              className="max-w-md"
-            />
-          </Container>
-        </section>
-      </main>
-
-      <CompareBar />
-      <SiteFooter email={settings?.email_general} whatsapp={settings?.whatsapp_general} />
-    </>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+            {barrios.slice(0, 4).map((b) => (
+              <Link 
+                key={b.id}
+                href={`/barrios/${b.slug}`}
+                className="group relative h-96 overflow-hidden rounded-sm flex items-end p-8"
+              >
+                <div 
+                  className="absolute inset-0 bg-cover bg-center transition-transform duration-700 group-hover:scale-110"
+                  style={{ backgroundImage: `url('${b.hero_image || "/images/hero-bg.jpg"}')` }}
+                />
+                <div className="absolute inset-0 bg-gradient-to-t from-isl-black via-isl-black/30 to-transparent" />
+                
+                <div className="relative z-10 text-white">
+                  <h3 className="font-serif text-2xl mb-2 group-hover:text-isl-gold transition-colors">{b.nombre}</h3>
+                  <p className="text-xs text-white/70 uppercase tracking-widest">Explorar Zona →</p>
+                </div>
+              </Link>
+            ))}
+          </div>
+        </Container>
+      </section>
+    </div>
   );
 }
