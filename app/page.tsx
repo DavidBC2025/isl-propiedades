@@ -83,7 +83,7 @@ export default async function HomePage() {
                   
                   <div className="flex items-center gap-4 text-sm text-black/90 font-medium mb-8 bg-white/40 px-4 py-2 rounded-sm backdrop-blur-md">
                     <span className="flex flex-col items-center">
-                      <strong className="text-xl font-normal">{p.habitaciones || 0}</strong> Habitaciones
+                      <strong className="text-xl font-normal">{(p as any).dormitorios || (p as any).habitaciones || 0}</strong> Dormits
                     </span>
                     <span className="h-8 w-px bg-black/20"></span>
                     <span className="flex flex-col items-center">
@@ -91,7 +91,7 @@ export default async function HomePage() {
                     </span>
                     <span className="h-8 w-px bg-black/20"></span>
                     <span className="flex flex-col items-center">
-                      <strong className="text-xl font-normal">{p.superficie_util || p.superficie_total || 'N/A'}</strong> m²
+                      <strong className="text-xl font-normal">{(p as any).superficie_construida || (p as any).superficie_total || (p as any).superficie_util || 'N/A'}</strong> m²
                     </span>
                   </div>
 
