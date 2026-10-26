@@ -2,8 +2,9 @@
 
 import { useState, useEffect } from "react";
 import Link from "next/link";
+import type { Propiedad } from "@/types/isl";
 
-export function HeroSlider({ propiedades }: { propiedades: any[] }) {
+export function HeroSlider({ propiedades }: { propiedades: Propiedad[] }) {
   const [currentIndex, setCurrentIndex] = useState(0);
 
   // Extraer las imágenes de las propiedades (o usar unas por defecto si no hay)
@@ -39,7 +40,7 @@ export function HeroSlider({ propiedades }: { propiedades: any[] }) {
           style={{ backgroundImage: `url('${img}')` }}
         />
       ))}
-      
+
       {/* Gradiente oscuro para que el texto sea legible */}
       <div className="absolute inset-0 bg-gradient-to-t from-isl-black via-isl-black/50 to-isl-black/70 z-10" />
 
@@ -55,7 +56,7 @@ export function HeroSlider({ propiedades }: { propiedades: any[] }) {
           Especialistas en propiedades residenciales de alta gama, gestión de activos y asesoría patrimonial.
         </p>
         <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
-          <Link 
+          <Link
             href="/propiedades"
             className="w-full sm:w-auto bg-isl-gold text-white px-8 py-4 text-xs font-medium uppercase tracking-[0.2em] hover:bg-white hover:text-isl-black transition-all duration-500 shadow-2xl"
           >

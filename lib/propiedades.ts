@@ -29,7 +29,11 @@ function applyPublicFilters<T extends { eq: (column: string, value: unknown) => 
 
 export async function getPropiedadesPublicadas(filtros: PropiedadFiltros = {}): Promise<Propiedad[]> {
   try {
-    let query = supabase.from("propiedades").select(WITH_AGENT).in("estado", PUBLIC_STATES).order("fecha_publicacion", { ascending: false });
+    let query = supabase.from("propiedades").select(WITH_AGENT).in("estado", PUBLIC_STATES);
+    
+    // Ordenar por fecha_publicacion si existe, si no por created_at
+    query = query.order("fecha_publicacion", { ascending: false, nullsFirst: false });
+    
     query = applyPublicFilters(query, filtros);
     if (filtros.pageSize !== undefined) {
       const page = Math.max(1, filtros.page ?? 1);
@@ -40,8 +44,20 @@ export async function getPropiedadesPublicadas(filtros: PropiedadFiltros = {}): 
     }
 
     const { data, error } = await query;
-    return error || !data ? [] : (data as Propiedad[]);
-  } catch {
+    
+    if (error) {
+      console.error("Error en getPropiedadesPublicadas:", error);
+      return [];
+    }
+    
+    if (!data || data.length === 0) {
+      console.log("No se encontraron propiedades publicadas");
+      return [];
+    }
+    
+    return data as Propiedad[];
+  } catch (error) {
+    console.error("Excepción en getPropiedadesPublicadas:", error);
     return [];
   }
 }
@@ -60,8 +76,20 @@ export async function countPropiedadesPublicadas(filtros: PropiedadFiltros = {})
 export async function getPropiedadBySlug(slug: string): Promise<Propiedad | null> {
   try {
     const { data, error } = await supabase.from("propiedades").select(WITH_AGENT).eq("slug", slug).in("estado", PUBLIC_STATES).maybeSingle();
-    return error || !data ? null : (data as Propiedad);
-  } catch {
+    
+    if (error) {
+      console.error("Error en getPropiedadBySlug:", error);
+      return null;
+    }
+    
+    if (!data) {
+      console.log(`Propiedad con slug "${slug}" no encontrada o no está publicada`);
+      return null;
+    }
+    
+    return data as Propiedad;
+  } catch (error) {
+    console.error("Excepción en getPropiedadBySlug:", error);
     return null;
   }
 }

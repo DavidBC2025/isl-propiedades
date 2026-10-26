@@ -1,16 +1,19 @@
-﻿"use client";
+"use client";
 
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import {
   guardarGeneral,
   guardarCalculadora,
   guardarComoTrabajamos,
   guardarCasoPreparacion,
   eliminarCasoPreparacion,
+  guardarLogo,
+  eliminarLogo,
 } from "@/app/admin/(app)/ajustes/actions";
 import { FieldHelp, fieldClassName } from "@/components/admin/FieldHelp";
 import { ButtonISL } from "@/components/isl/ButtonISL";
 import { MediaUploader } from "@/components/isl/MediaUploader";
+import { validarArchivoLogo } from "@/lib/logo";
 import type { CasoPreparacion, Propiedad, SiteSettings } from "@/types/isl";
 
 function SectionWrapper({ title, children }: { title: string; children: React.ReactNode }) {
@@ -22,10 +25,18 @@ function SectionWrapper({ title, children }: { title: string; children: React.Re
   );
 }
 
+const transparencyGrid = {
+  backgroundColor: "#ffffff",
+  backgroundImage:
+    "linear-gradient(45deg, #e5e5e5 25%, transparent 25%), linear-gradient(-45deg, #e5e5e5 25%, transparent 25%), linear-gradient(45deg, transparent 75%, #e5e5e5 75%), linear-gradient(-45deg, transparent 75%, #e5e5e5 75%)",
+  backgroundPosition: "0 0, 0 8px, 8px -8px, -8px 0",
+  backgroundSize: "16px 16px",
+} as const;
+
 function SaveButton({ onClick, saving, label }: { onClick: () => void; saving: boolean; label: string }) {
   return (
     <ButtonISL type="button" onClick={onClick} disabled={saving}>
-      {saving ? "Guardandoâ€¦" : label}
+      {saving ? "Guardando…" : label}
     </ButtonISL>
   );
 }
@@ -35,12 +46,308 @@ export function AjustesForm({ settings, propiedades, casos }: { settings: SiteSe
 
   return (
     <div className="space-y-8">
+      <LogoSection settings={settings} setAviso={setAviso} />
       <GeneralSection settings={settings} setAviso={setAviso} />
       <CalculadoraSection settings={settings} setAviso={setAviso} />
       <ComoTrabajamosSection settings={settings} setAviso={setAviso} />
       <CasosPreparacionSection casos={casos} propiedades={propiedades} setAviso={setAviso} />
       {aviso ? <p role="status" className="border border-isl-gold/40 bg-isl-champagne/40 px-4 py-3 text-sm">{aviso}</p> : null}
     </div>
+  );
+}
+
+function LogoSection({
+  settings,
+  setAviso,
+}: {
+  settings: SiteSettings | null;
+  setAviso: (msg: string | null) => void;
+}) {
+  const [currentLogo, setCurrentLogo] = useState<string | null>(settings?.logo ?? null);
+  const [selectedFile, setSelectedFile] = useState<File | null>(null);
+  const [previewUrl, setPreviewUrl] = useState<string | null>(null);
+  const [fileDetails, setFileDetails] = useState<{ name: string; size: string; dimensions?: string } | null>(null);
+  const [saving, setSaving] = useState(false);
+  const [deleting, setDeleting] = useState(false);
+  const [confirmDelete, setConfirmDelete] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [success, setSuccess] = useState<string | null>(null);
+  const [isDragging, setIsDragging] = useState(false);
+  const fileInputRef = useRef<HTMLInputElement>(null);
+
+  useEffect(() => {
+    return () => {
+      if (previewUrl && previewUrl.startsWith("blob:")) {
+        URL.revokeObjectURL(previewUrl);
+      }
+    };
+  }, [previewUrl]);
+
+  function handleFileSelection(file: File) {
+    setError(null);
+    setSuccess(null);
+    setConfirmDelete(false);
+
+    const validation = validarArchivoLogo(file);
+    if (!validation.ok) {
+      setError(validation.error);
+      return;
+    }
+
+    if (previewUrl && previewUrl.startsWith("blob:")) {
+      URL.revokeObjectURL(previewUrl);
+    }
+
+    const objectUrl = URL.createObjectURL(file);
+    setSelectedFile(file);
+    setPreviewUrl(objectUrl);
+
+    const img = new Image();
+    img.onload = () => {
+      setFileDetails({
+        name: file.name,
+        size: `${(file.size / 1024).toFixed(1)} KB`,
+        dimensions: `${img.naturalWidth} × ${img.naturalHeight} px`,
+      });
+    };
+    img.src = objectUrl;
+  }
+
+  function handleInputChange(e: React.ChangeEvent<HTMLInputElement>) {
+    const file = e.target.files?.[0];
+    if (file) {
+      handleFileSelection(file);
+    }
+    e.target.value = "";
+  }
+
+  function handleDrop(e: React.DragEvent<HTMLDivElement>) {
+    e.preventDefault();
+    setIsDragging(false);
+    const file = e.dataTransfer.files?.[0];
+    if (file) {
+      handleFileSelection(file);
+    }
+  }
+
+  function handleCancelSelection() {
+    if (previewUrl && previewUrl.startsWith("blob:")) {
+      URL.revokeObjectURL(previewUrl);
+    }
+    setSelectedFile(null);
+    setPreviewUrl(null);
+    setFileDetails(null);
+    setError(null);
+  }
+
+  async function handleSave() {
+    if (!selectedFile) return;
+
+    setSaving(true);
+    setError(null);
+    setSuccess(null);
+
+    const formData = new FormData();
+    formData.append("logo", selectedFile);
+
+    const result = await guardarLogo(formData);
+    setSaving(false);
+
+    if (result.ok) {
+      setCurrentLogo(result.logoUrl);
+      setSelectedFile(null);
+      setPreviewUrl(null);
+      setFileDetails(null);
+      setSuccess("¡Logo guardado exitosamente! Ya se encuentra visible en el sitio web.");
+      setAviso("Listo, quedó guardado el logo del sitio.");
+    } else {
+      setError(result.error);
+    }
+  }
+
+  async function handleDelete() {
+    setDeleting(true);
+    setError(null);
+    setSuccess(null);
+
+    const result = await eliminarLogo();
+    setDeleting(false);
+
+    if (result.ok) {
+      setCurrentLogo(null);
+      setConfirmDelete(false);
+      setSuccess("El logo fue eliminado. Se restauró la identidad visual predeterminada de ISL Propiedades.");
+      setAviso("Logo eliminado. Se restauró la identidad predeterminada.");
+    } else {
+      setError(result.error);
+    }
+  }
+
+  return (
+    <SectionWrapper title="Logo del sitio web — ISL Propiedades">
+      <div className="space-y-6">
+        <p className="text-sm text-isl-black/70">
+          Sube el logo oficial de <strong>ISL Propiedades</strong> en formato <strong>PNG</strong> (se recomienda con fondo transparente). Tamaño máximo: <strong>2 MB</strong>. Este logo se mostrará de manera automática en el encabezado principal y en la identidad visual del sitio.
+        </p>
+
+        {/* Input de archivo oculto */}
+        <input
+          ref={fileInputRef}
+          type="file"
+          accept="image/png"
+          className="sr-only"
+          onChange={handleInputChange}
+          id="logo-file-input"
+        />
+
+        {/* Vista previa del archivo seleccionado (sin guardar) */}
+        {previewUrl ? (
+          <div className="space-y-4 rounded-sm border border-isl-gold/40 bg-isl-champagne/20 p-6">
+            <div className="flex items-center justify-between">
+              <span className="text-xs font-semibold uppercase tracking-wider text-isl-gold">
+                Vista previa del nuevo logo (sin guardar)
+              </span>
+              {fileDetails ? (
+                <span className="text-xs text-isl-black/60">
+                  {fileDetails.name} · {fileDetails.size} {fileDetails.dimensions ? `· ${fileDetails.dimensions}` : ""}
+                </span>
+              ) : null}
+            </div>
+
+            <div className="flex min-h-[140px] items-center justify-center rounded-sm border border-isl-black/10 bg-transparent p-6" style={transparencyGrid}>
+              <img
+                src={previewUrl}
+                alt="Vista previa del logo"
+                className="max-h-24 max-w-full bg-transparent object-contain"
+              />
+            </div>
+
+            <div className="flex flex-wrap items-center justify-end gap-3 pt-2">
+              <button
+                type="button"
+                onClick={handleCancelSelection}
+                disabled={saving}
+                className="min-h-11 rounded-sm border border-isl-black/20 bg-isl-white px-4 py-2 text-xs font-medium uppercase tracking-[0.12em] text-isl-black hover:bg-isl-offwhite disabled:opacity-50"
+              >
+                Cancelar
+              </button>
+              <ButtonISL type="button" onClick={handleSave} disabled={saving}>
+                {saving ? "Guardando logo…" : "Guardar logo"}
+              </ButtonISL>
+            </div>
+          </div>
+        ) : currentLogo ? (
+          /* Logo actualmente guardado */
+          <div className="space-y-4 rounded-sm border border-isl-black/10 bg-transparent p-6">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-2">
+                <span className="inline-block size-2 rounded-full bg-emerald-500" />
+                <span className="text-xs font-medium uppercase tracking-wider text-isl-black">
+                  Logo actual guardado
+                </span>
+              </div>
+            </div>
+
+            <div className="flex min-h-[140px] items-center justify-center rounded-sm border border-isl-black/10 bg-transparent p-6" style={transparencyGrid}>
+              <img
+                src={currentLogo}
+                alt="Logo ISL Propiedades guardado"
+                className="max-h-24 max-w-full bg-transparent object-contain"
+              />
+            </div>
+
+            {confirmDelete ? (
+              <div className="rounded-sm border border-red-200 bg-red-50 p-4">
+                <p className="text-sm font-medium text-red-900">
+                  ¿Seguro que deseas eliminar el logo?
+                </p>
+                <p className="mt-1 text-xs text-red-700">
+                  Se restaurará la identidad visual de texto predeterminada (ISL) en todo el sitio web.
+                </p>
+                <div className="mt-4 flex items-center justify-end gap-3">
+                  <button
+                    type="button"
+                    onClick={() => setConfirmDelete(false)}
+                    disabled={deleting}
+                    className="min-h-10 rounded-sm border border-isl-black/20 bg-isl-white px-3 py-1.5 text-xs font-medium uppercase tracking-wider text-isl-black hover:bg-isl-offwhite"
+                  >
+                    Cancelar
+                  </button>
+                  <button
+                    type="button"
+                    onClick={handleDelete}
+                    disabled={deleting}
+                    className="min-h-10 rounded-sm bg-red-700 px-4 py-1.5 text-xs font-medium uppercase tracking-wider text-isl-white hover:bg-red-800 disabled:opacity-50"
+                  >
+                    {deleting ? "Eliminando…" : "Sí, eliminar logo"}
+                  </button>
+                </div>
+              </div>
+            ) : (
+              <div className="flex flex-wrap items-center justify-between gap-3 pt-2">
+                <button
+                  type="button"
+                  onClick={() => setConfirmDelete(true)}
+                  className="text-xs text-red-600 underline-offset-4 hover:underline"
+                >
+                  Eliminar logo
+                </button>
+                <button
+                  type="button"
+                  onClick={() => fileInputRef.current?.click()}
+                  className="min-h-11 rounded-sm border border-isl-black/20 bg-isl-white px-4 py-2 text-xs font-medium uppercase tracking-[0.12em] text-isl-black hover:bg-isl-offwhite"
+                >
+                  Reemplazar logo
+                </button>
+              </div>
+            )}
+          </div>
+        ) : (
+          /* Zona de subida cuando no hay logo */
+          <div
+            className="cursor-pointer rounded-sm border-2 border-dashed border-isl-black/20 bg-isl-offwhite/50 p-8 text-center transition hover:border-isl-black/40 hover:bg-isl-offwhite"
+            data-dragging={isDragging || undefined}
+            onClick={() => fileInputRef.current?.click()}
+            onDragOver={(e) => {
+              e.preventDefault();
+              setIsDragging(true);
+            }}
+            onDragLeave={() => setIsDragging(false)}
+            onDrop={handleDrop}
+            role="button"
+            tabIndex={0}
+            onKeyDown={(e) => {
+              if (e.key === "Enter" || e.key === " ") fileInputRef.current?.click();
+            }}
+          >
+            <p className="font-serif text-2xl text-isl-black">
+              Selecciona o arrastra el logo de ISL Propiedades
+            </p>
+            <p className="mt-2 text-sm text-isl-black/60">
+              Formato PNG (.png) con fondo transparente · Máximo 2 MB
+            </p>
+            <div className="mt-4">
+              <span className="inline-flex min-h-11 items-center rounded-sm bg-isl-black px-5 py-2 text-xs font-medium uppercase tracking-[0.12em] text-isl-white">
+                Subir logo PNG
+              </span>
+            </div>
+          </div>
+        )}
+
+        {/* Mensajes de error o éxito */}
+        {error ? (
+          <div role="alert" className="rounded-sm border border-red-200 bg-red-50 p-3 text-sm text-red-900">
+            {error}
+          </div>
+        ) : null}
+
+        {success ? (
+          <div role="status" className="rounded-sm border border-emerald-200 bg-emerald-50 p-3 text-sm text-emerald-900">
+            {success}
+          </div>
+        ) : null}
+      </div>
+    </SectionWrapper>
   );
 }
 
@@ -354,7 +661,7 @@ function CasosPreparacionSection({
     <SectionWrapper title="Casos antes / despuÃ©s">
       <div className="space-y-4">
         <p className="text-sm text-isl-black/70">
-          Fotos de propiedades que transformaste con la preparaciÃ³n ISL. Cada caso necesita una foto "antes" y una "despuÃ©s".
+          Fotos de propiedades que transformaste con la preparaciÃ³n ISL. Cada caso necesita una foto &quot;antes&quot; y una &quot;despuÃ©s&quot;.
         </p>
 
         {casos.length === 0 && !editing ? (

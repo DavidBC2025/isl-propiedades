@@ -83,9 +83,9 @@ export function FichaPropiedadDetalle({ propiedad, agente, similaresHref = "#sim
       {caracteristicas.length > 0 ? (
         <section>
           <h2 className="font-serif text-3xl font-normal text-isl-black">Características</h2>
-          <ul className="mt-5 flex flex-wrap gap-2">
+          <ul className="mt-4 space-y-2 text-base leading-7 text-isl-black/80">
             {caracteristicas.map((item) => (
-              <li key={item} className="rounded-sm bg-isl-offwhite px-3 py-2 text-sm text-isl-black">{item}</li>
+              <li key={item}>{item}</li>
             ))}
           </ul>
         </section>

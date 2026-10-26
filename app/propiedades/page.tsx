@@ -46,7 +46,7 @@ export default async function CatalogPage({ searchParams }: CatalogPageProps) {
 
   return (
     <>
-      <SiteHeader whatsapp={settings?.whatsapp_general} />
+      <SiteHeader whatsapp={settings?.whatsapp_general} logo={settings?.logo} />
       <main className="pb-8">
         <Container className="isl-section">
           <p className="text-xs font-medium uppercase tracking-widest text-isl-gray">Catálogo</p>
@@ -93,7 +93,7 @@ export default async function CatalogPage({ searchParams }: CatalogPageProps) {
         </Container>
       </main>
       <CompareBar />
-      <SiteFooter email={settings?.email_general} whatsapp={settings?.whatsapp_general} />
+      <SiteFooter email={settings?.email_general} whatsapp={settings?.whatsapp_general} logo={settings?.logo} />
     </>
   );
 }

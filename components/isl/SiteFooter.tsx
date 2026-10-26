@@ -6,16 +6,27 @@ import { buildWhatsAppLink } from "@/lib/whatsapp";
 type SiteFooterProps = {
   email?: string | null;
   whatsapp?: string | null;
+  logo?: string | null;
 };
 
-export function SiteFooter({ email, whatsapp }: SiteFooterProps) {
+export function SiteFooter({ email, whatsapp, logo }: SiteFooterProps) {
   const year = new Date().getFullYear();
 
   return (
     <footer className="border-t border-isl-black/10 bg-isl-black text-isl-white">
       <Container className="grid gap-10 py-16 md:grid-cols-3">
         <div>
-          <p className="font-serif text-3xl">ISL Propiedades</p>
+          {logo ? (
+            <div className="mb-4 bg-transparent">
+              <img
+                src={logo}
+                alt="ISL Propiedades"
+                className="h-10 w-auto max-w-[200px] bg-transparent object-contain"
+              />
+            </div>
+          ) : (
+            <p className="font-serif text-3xl">ISL Propiedades</p>
+          )}
           <p className="mt-4 max-w-sm text-sm leading-6 text-isl-white/70">
             Corredora boutique en Viña del Mar. Silvia e Ivannia, con criterio y trato directo.
           </p>

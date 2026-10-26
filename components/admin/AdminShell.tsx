@@ -9,6 +9,7 @@ import { ADMIN_NAV } from "@/lib/admin-copy";
 type AdminShellProps = {
   greeting: string;
   consultasNuevas: number;
+  logo?: string | null;
   children: ReactNode;
 };
 
@@ -17,7 +18,7 @@ function isActive(pathname: string, href: string) {
   return pathname === href || pathname.startsWith(`${href}/`);
 }
 
-export function AdminShell({ greeting, consultasNuevas, children }: AdminShellProps) {
+export function AdminShell({ greeting, consultasNuevas, logo, children }: AdminShellProps) {
   const pathname = usePathname();
 
   const links = ADMIN_NAV.map((item) => {
@@ -45,7 +46,11 @@ export function AdminShell({ greeting, consultasNuevas, children }: AdminShellPr
   return (
     <div className="min-h-screen bg-isl-offwhite">
       <header className="flex items-center justify-between gap-3 border-b border-isl-black/10 bg-isl-white px-4 py-3 lg:hidden">
-        <p className="font-serif text-xl">ISL</p>
+        {logo ? (
+          <img src={logo} alt="ISL Propiedades" className="h-7 w-auto max-w-[120px] object-contain" />
+        ) : (
+          <p className="font-serif text-xl">ISL</p>
+        )}
         <div className="flex items-center gap-2">
           <a href="/" target="_blank" rel="noreferrer" className="text-sm underline-offset-4 hover:underline">
             Ver el sitio
@@ -63,7 +68,13 @@ export function AdminShell({ greeting, consultasNuevas, children }: AdminShellPr
 
       <div className="lg:grid lg:grid-cols-[16rem_minmax(0,1fr)]">
         <aside className="hidden min-h-screen flex-col border-r border-isl-black/10 bg-isl-white px-4 py-6 lg:flex">
-          <p className="font-serif text-2xl">ISL</p>
+          {logo ? (
+            <div className="mb-2">
+              <img src={logo} alt="ISL Propiedades" className="h-9 w-auto max-w-[160px] object-contain" />
+            </div>
+          ) : (
+            <p className="font-serif text-2xl">ISL</p>
+          )}
           <p className="mt-2 text-sm text-isl-black/70">{greeting}</p>
           <a
             href="/"

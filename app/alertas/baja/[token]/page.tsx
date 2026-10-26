@@ -26,7 +26,7 @@ export default async function BajaAlertaPage({ params }: BajaPageProps) {
 
   return (
     <>
-      <SiteHeader whatsapp={settings?.whatsapp_general} />
+      <SiteHeader whatsapp={settings?.whatsapp_general} logo={settings?.logo} />
       <main>
         <Container className="isl-section">
           {found ? (
@@ -46,7 +46,7 @@ export default async function BajaAlertaPage({ params }: BajaPageProps) {
           )}
         </Container>
       </main>
-      <SiteFooter email={settings?.email_general} whatsapp={settings?.whatsapp_general} />
+      <SiteFooter email={settings?.email_general} whatsapp={settings?.whatsapp_general} logo={settings?.logo} />
     </>
   );
 }

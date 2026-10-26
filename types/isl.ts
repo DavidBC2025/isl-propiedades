@@ -190,6 +190,7 @@ export type SiteSettings = {
   calc_gastos_escritura_uf: number | null;
   calc_pie_porcentaje: number | null;
   disclaimer_calculadora: string | null;
+  logo: string | null;
   como_trabajamos: ComoTrabajamosItem[];
   updated_at: Timestamp | null;
 };

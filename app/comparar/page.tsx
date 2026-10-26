@@ -68,7 +68,7 @@ export default async function ComparePage({ searchParams }: ComparePageProps) {
 
   return (
     <>
-      <SiteHeader whatsapp={settings?.whatsapp_general} />
+      <SiteHeader whatsapp={settings?.whatsapp_general} logo={settings?.logo} />
       <main>
         <Container className="isl-section">
           <p className="text-xs font-medium uppercase tracking-widest text-isl-gray">Comparar</p>
@@ -133,7 +133,7 @@ export default async function ComparePage({ searchParams }: ComparePageProps) {
           )}
         </Container>
       </main>
-      <SiteFooter email={settings?.email_general} whatsapp={settings?.whatsapp_general} />
+      <SiteFooter email={settings?.email_general} whatsapp={settings?.whatsapp_general} logo={settings?.logo} />
     </>
   );
 }

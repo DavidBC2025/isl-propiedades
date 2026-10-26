@@ -40,7 +40,7 @@ async function getJsonLd() {
     "name": "ISL Propiedades",
     "description": "Corredora boutique de propiedades en Viña del Mar",
     "url": baseUrl,
-    "logo": `${baseUrl}/favicon.ico`,
+    "logo": settings?.logo || `${baseUrl}/favicon.ico`,
     "address": {
       "@type": "PostalAddress",
       "addressLocality": "Viña del Mar",

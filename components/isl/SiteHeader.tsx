@@ -5,17 +5,26 @@ import { buildWhatsAppLink } from "@/lib/whatsapp";
 type SiteHeaderProps = {
   variant?: "overlay" | "solid";
   whatsapp?: string | null;
+  logo?: string | null;
 };
 
-export function SiteHeader({ variant = "solid", whatsapp }: SiteHeaderProps) {
+export function SiteHeader({ variant = "solid", whatsapp, logo }: SiteHeaderProps) {
   const overlay = variant === "overlay";
   const text = overlay ? "text-isl-white" : "text-isl-black";
 
   return (
-    <header className={overlay ? "absolute inset-x-0 top-0 z-30" : "border-b border-isl-black/10 bg-isl-white"}>
+    <header className={overlay ? "absolute inset-x-0 top-0 z-30" : "border-b border-isl-black/10 bg-transparent backdrop-blur-sm"}>
       <div className={`mx-auto flex max-w-7xl items-center justify-between gap-4 px-6 py-5 md:px-12 lg:px-16 ${text}`}>
-        <Link href="/" className="font-serif text-2xl tracking-wide">
-          ISL
+        <Link href="/" className="inline-flex items-center bg-transparent" aria-label="ISL Propiedades - Inicio">
+          {logo ? (
+            <img
+              src={logo}
+              alt="ISL Propiedades"
+              className="h-10 w-auto max-w-[220px] bg-transparent object-contain transition-opacity duration-200 hover:opacity-90"
+            />
+          ) : (
+            <span className="font-serif text-2xl tracking-wide">ISL</span>
+          )}
         </Link>
         <nav className="hidden items-center gap-6 text-xs font-medium uppercase tracking-[0.12em] lg:flex" aria-label="Principal">
           {NAV_LINKS.map((link) => (

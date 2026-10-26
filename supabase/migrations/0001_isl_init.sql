@@ -176,6 +176,7 @@ create table if not exists public.site_settings (
   calc_gastos_escritura_uf numeric,
   calc_pie_porcentaje numeric,
   disclaimer_calculadora text,
+  logo text,
   como_trabajamos jsonb default '[]'::jsonb,
   updated_at timestamptz default now()
 );

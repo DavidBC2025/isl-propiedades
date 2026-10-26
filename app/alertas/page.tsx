@@ -23,7 +23,7 @@ export default async function AlertasPage({ searchParams }: AlertasPageProps) {
 
   return (
     <>
-      <SiteHeader whatsapp={settings?.whatsapp_general} />
+      <SiteHeader whatsapp={settings?.whatsapp_general} logo={settings?.logo} />
       <main>
         <Container className="isl-section grid items-start gap-12 lg:grid-cols-2">
           <div>
@@ -43,7 +43,7 @@ export default async function AlertasPage({ searchParams }: AlertasPageProps) {
           />
         </Container>
       </main>
-      <SiteFooter email={settings?.email_general} whatsapp={settings?.whatsapp_general} />
+      <SiteFooter email={settings?.email_general} whatsapp={settings?.whatsapp_general} logo={settings?.logo} />
     </>
   );
 }

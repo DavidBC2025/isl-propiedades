@@ -119,7 +119,7 @@ export default async function FichaPropiedadPage({ params }: FichaPageProps) {
     <>
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: jsonLd(listingJsonLd(propiedad, url)) }} />
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: jsonLd(breadcrumbJsonLd(propiedad, url, origin)) }} />
-      <SiteHeader whatsapp={settings?.whatsapp_general} />
+      <SiteHeader whatsapp={settings?.whatsapp_general} logo={settings?.logo} />
       <main>
         <Container className="pt-8">
           <nav aria-label="Migas de pan" className="text-sm text-isl-black/65">
@@ -153,7 +153,7 @@ export default async function FichaPropiedadPage({ params }: FichaPageProps) {
         ) : null}
       </main>
       <CompareBar />
-      <SiteFooter email={settings?.email_general} whatsapp={settings?.whatsapp_general} />
+      <SiteFooter email={settings?.email_general} whatsapp={settings?.whatsapp_general} logo={settings?.logo} />
     </>
   );
 }
