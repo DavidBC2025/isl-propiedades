@@ -19,6 +19,7 @@ export function HomeHero({ slides, coverCount }: HomeHeroProps) {
   const [index, setIndex] = useState(0);
   const [previousImageUrl, setPreviousImageUrl] = useState<string | undefined>();
   const indexRef = useRef(0);
+  const seenIndexesRef = useRef(new Set<number>([0]));
   const transitionTimer = useRef<number | null>(null);
   const canRotate = slides.length > 1;
   const current = slides[Math.min(index, slides.length - 1)] ?? slides[0];
@@ -28,6 +29,7 @@ export function HomeHero({ slides, coverCount }: HomeHeroProps) {
     if (nextIndex === currentIndex) return;
     setPreviousImageUrl(reducedMotion ? undefined : slides[currentIndex]?.imageUrl);
     indexRef.current = nextIndex;
+    seenIndexesRef.current.add(nextIndex);
     setIndex(nextIndex);
     if (reducedMotion) return;
     if (transitionTimer.current !== null) window.clearTimeout(transitionTimer.current);
@@ -41,19 +43,22 @@ export function HomeHero({ slides, coverCount }: HomeHeroProps) {
     if (!canRotate) return;
     const timer = window.setInterval(() => {
       const currentIndex = indexRef.current;
-      const coverIndexes = Array.from(
-        { length: Math.min(coverCount, slides.length) },
-        (_, slideIndex) => slideIndex,
-      ).filter((slideIndex) => slideIndex !== currentIndex);
-      const galleryIndexes = Array.from(
-        { length: Math.max(0, slides.length - coverCount) },
-        (_, slideIndex) => slideIndex + coverCount,
-      ).filter((slideIndex) => slideIndex !== currentIndex);
-      const preferredIndexes = Math.random() < 0.75 ? coverIndexes : galleryIndexes;
-      const candidates = preferredIndexes.length > 0
-        ? preferredIndexes
-        : [...coverIndexes, ...galleryIndexes];
-      const nextIndex = candidates[Math.floor(Math.random() * candidates.length)];
+      let candidates = Array.from({ length: slides.length }, (_, slideIndex) => slideIndex)
+        .filter((slideIndex) => slideIndex !== currentIndex && !seenIndexesRef.current.has(slideIndex));
+
+      if (candidates.length === 0) {
+        seenIndexesRef.current = new Set([currentIndex]);
+        candidates = Array.from({ length: slides.length }, (_, slideIndex) => slideIndex)
+          .filter((slideIndex) => slideIndex !== currentIndex);
+      }
+
+      const coverCandidates = candidates.filter((slideIndex) => slideIndex < coverCount);
+      const galleryCandidates = candidates.filter((slideIndex) => slideIndex >= coverCount);
+      const preferredCandidates = Math.random() < 0.75 ? coverCandidates : galleryCandidates;
+      const availableCandidates = preferredCandidates.length > 0
+        ? preferredCandidates
+        : [...coverCandidates, ...galleryCandidates];
+      const nextIndex = availableCandidates[Math.floor(Math.random() * availableCandidates.length)];
       if (nextIndex !== undefined) transitionTo(nextIndex);
     }, 5000);
     return () => window.clearInterval(timer);
