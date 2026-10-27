@@ -21,11 +21,11 @@ export function SiteFooter({ email, whatsapp, logo }: SiteFooterProps) {
               <img
                 src={logo}
                 alt="ISL Propiedades"
-                className="h-10 w-auto max-w-[200px] bg-transparent object-contain"
+                className="h-20 w-auto max-w-[min(400px,80vw)] bg-transparent object-contain"
               />
             </div>
           ) : (
-            <p className="font-serif text-3xl">ISL Propiedades</p>
+            <p className="font-serif text-6xl">ISL Propiedades</p>
           )}
           <p className="mt-4 max-w-sm text-sm leading-6 text-isl-white/70">
             Corredora boutique en Viña del Mar. Silvia e Ivannia, con criterio y trato directo.

@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { ButtonISL } from "@/components/isl/ButtonISL";
 import { Container } from "@/components/isl/Container";
 import { HeroMedia } from "@/components/isl/HeroMedia";
@@ -16,16 +16,33 @@ type HomeHeroProps = {
 export function HomeHero({ slides }: HomeHeroProps) {
   const reducedMotion = usePrefersReducedMotion();
   const [index, setIndex] = useState(0);
+  const [previousImageUrl, setPreviousImageUrl] = useState<string | undefined>();
+  const transitionTimer = useRef<number | null>(null);
   const canRotate = !reducedMotion && slides.length > 1;
   const current = slides[Math.min(index, slides.length - 1)] ?? slides[0];
+
+  const transitionTo = useCallback((nextIndex: number) => {
+    if (nextIndex === index) return;
+    setPreviousImageUrl(slides[index]?.imageUrl);
+    setIndex(nextIndex);
+    if (transitionTimer.current !== null) window.clearTimeout(transitionTimer.current);
+    transitionTimer.current = window.setTimeout(() => {
+      setPreviousImageUrl(undefined);
+      transitionTimer.current = null;
+    }, 1000);
+  }, [index, slides]);
 
   useEffect(() => {
     if (!canRotate) return;
     const timer = window.setInterval(() => {
-      setIndex((currentIndex) => (currentIndex + 1) % slides.length);
-    }, 8000);
+      transitionTo((index + 1) % slides.length);
+    }, 5000);
     return () => window.clearInterval(timer);
-  }, [canRotate, slides.length]);
+  }, [canRotate, index, slides.length, transitionTo]);
+
+  useEffect(() => () => {
+    if (transitionTimer.current !== null) window.clearTimeout(transitionTimer.current);
+  }, []);
 
   if (!current) return null;
 
@@ -36,6 +53,7 @@ export function HomeHero({ slides }: HomeHeroProps) {
         imageUrl={current.imageUrl}
         videoUrl={current.videoUrl}
         autoPlayVideo={!reducedMotion}
+        previousImageUrl={previousImageUrl}
       >
         <Container className="flex w-full flex-col justify-end pb-16 pt-28 md:pb-24">
           <p className="mb-4 text-xs font-medium uppercase tracking-[0.2em] text-isl-gold">ISL Propiedades</p>
@@ -67,7 +85,7 @@ export function HomeHero({ slides }: HomeHeroProps) {
                   aria-selected={slideIndex === index}
                   aria-label={`Mostrar slide ${slideIndex + 1}`}
                   className="flex min-h-11 min-w-11 items-center justify-center"
-                  onClick={() => setIndex(slideIndex)}
+                  onClick={() => transitionTo(slideIndex)}
                 >
                   <span className={`block h-2 w-8 rounded-full ${slideIndex === index ? "bg-isl-gold" : "bg-isl-white/40"}`} />
                 </button>

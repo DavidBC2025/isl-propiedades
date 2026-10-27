@@ -3,13 +3,14 @@ import { parseVideoUrl } from "@/lib/media";
 
 type HeroMediaProps = {
   imageUrl?: string;
+  previousImageUrl?: string;
   videoUrl?: string;
   autoPlayVideo?: boolean;
   children?: ReactNode;
   className?: string;
 };
 
-export function HeroMedia({ imageUrl, videoUrl, autoPlayVideo = true, children, className }: HeroMediaProps) {
+export function HeroMedia({ imageUrl, previousImageUrl, videoUrl, autoPlayVideo = true, children, className }: HeroMediaProps) {
   const video = videoUrl ? parseVideoUrl(videoUrl) : { kind: "unknown" as const };
   const hasEmbeddableVideo = (video.kind === "youtube" || video.kind === "vimeo") && video.embedUrl;
 
@@ -32,6 +33,9 @@ export function HeroMedia({ imageUrl, videoUrl, autoPlayVideo = true, children, 
       ) : (
         <div className="absolute inset-0 bg-[radial-gradient(circle_at_70%_25%,rgba(198,168,124,0.35),transparent_35%),linear-gradient(135deg,#0A0A0A,#292521)]" aria-hidden="true" />
       )}
+      {previousImageUrl ? (
+        <img className="isl-cross-dissolve absolute inset-0 size-full object-cover" src={previousImageUrl} alt="" />
+      ) : null}
       <div className="isl-hero-overlay absolute inset-0" aria-hidden="true" />
       {children ? <div className="relative z-10 flex min-h-[34rem] md:min-h-screen">{children}</div> : null}
     </section>

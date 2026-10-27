@@ -86,6 +86,11 @@ a {
   to { opacity: 1; transform: translateY(0); }
 }
 
+@keyframes isl-cross-dissolve {
+  from { opacity: 1; }
+  to { opacity: 0; }
+}
+
 @media (min-width: 768px) {
   .isl-section { padding-block: 8rem; }
 }
@@ -93,4 +98,5 @@ a {
 @media (prefers-reduced-motion: no-preference) {
   .isl-kenburns { animation: isl-kenburns 8s ease-out both; }
   .isl-fade-up { animation: isl-fade-up 500ms ease-out both; }
+  .isl-cross-dissolve { animation: isl-cross-dissolve 1000ms ease-in-out both; }
 }

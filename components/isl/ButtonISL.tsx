@@ -42,7 +42,7 @@ export function ButtonISL({
   "aria-label": ariaLabel,
 }: ButtonISLProps) {
   const classes = [
-    "inline-flex items-center justify-center rounded-sm font-sans font-medium uppercase tracking-[0.12em] transition duration-300 motion-safe:hover:-translate-y-0.5",
+    "inline-flex items-center justify-center rounded-sm font-sans font-medium uppercase tracking-[0.12em] transition-all duration-300 ease-in-out motion-safe:hover:-translate-y-0.5 motion-safe:hover:scale-[1.02]",
     variantClasses[variant],
     sizeClasses[size],
     disabled ? "pointer-events-none opacity-50" : "",

@@ -49,6 +49,12 @@ export default async function Home() {
   const slides = buildHomeHeroSlides(heroSlides, propiedadPrincipal, settings);
   const seleccion = propiedades.slice(0, 6);
   const guia = articulos.slice(0, 3);
+  const propertyImages = seleccion.flatMap((propiedad) => (
+    Array.isArray(propiedad.imagenes) ? propiedad.imagenes : []
+  ));
+  const searchImage = slides.find((slide) => slide.imageUrl)?.imageUrl;
+  const whyImage = propertyImages.find((imagen) => imagen.portada)?.url ?? propertyImages[0]?.url;
+  const insightsImage = guia.find((articulo) => articulo.imagen_destacada)?.imagen_destacada ?? undefined;
 
   return (
     <>
@@ -59,11 +65,12 @@ export default async function Home() {
         <HomeHero slides={slides} />
 
         {/* Selección */}
-        <section className="isl-section">
+        <section className="isl-section bg-[#F3F0EA]">
           <Container>
             <SectionTitle
-              title="Selección ISL"
-              subtitle="PROPIEDADES DESTACADAS"
+              title="Propiedades destacadas"
+              subtitle="SELECCIÓN ISL"
+              accentWord="Propiedades"
               className="mb-12"
             />
             {seleccion.length === 0 ? (
@@ -84,38 +91,40 @@ export default async function Home() {
         </section>
 
         {/* Buscador */}
-        <section className="isl-section bg-isl-offwhite">
-          <Container>
+        <section className="isl-section relative isolate overflow-hidden bg-[#101010] text-isl-white">
+          <EditorialBackdrop imageUrl={searchImage} />
+          <Container className="relative z-10">
             <SectionTitle
               title="Encuentra tu propiedad"
               subtitle="BÚSQUEDA RÁPIDA"
-              className="mb-12 text-center"
+              className="mb-12 text-center [&_h2]:text-isl-white [&_p]:text-isl-gold"
             />
-            <QuickSearch />
+            <QuickSearch dark />
           </Container>
         </section>
 
         {/* Mirada ISL */}
-        <section className="isl-section">
+        <section className="isl-section bg-[#F3F0EA]">
           <Container>
             <div className="mx-auto max-w-3xl">
               <SectionTitle
                 title="La Mirada ISL"
                 subtitle="NUESTRA IDENTIDAD"
+                accentWord="ISL"
                 className="mb-16 text-center"
               />
               <div className="grid gap-12 md:grid-cols-2">
                 {agentes.map((agente) => (
-                  <div key={agente.id} className="space-y-4">
+                  <div key={agente.id} className="space-y-4 rounded-sm border border-isl-black/10 bg-white p-4 shadow-lg">
                     {agente.foto_url ? (
                       <img
                         src={agente.foto_url}
                         alt={agente.nombre}
-                        className="aspect-square w-full object-cover bg-isl-champagne/20"
+                        className="aspect-[4/5] w-full object-cover bg-isl-champagne/20"
                       />
                     ) : (
                       <div className="aspect-square w-full bg-isl-champagne/20 flex items-center justify-center">
-                        <span className="font-serif text-2xl text-isl-black/20">
+                        <span className="font-serif text-2xl text-isl-black/40">
                           {agente.nombre.split(" ")[0]}
                         </span>
                       </div>
@@ -144,19 +153,21 @@ export default async function Home() {
         </section>
 
         {/* Por qué ISL */}
-        <section className="isl-section bg-isl-offwhite">
-          <Container>
+        <section className="isl-section relative isolate overflow-hidden bg-[#101010] text-isl-white">
+          <EditorialBackdrop imageUrl={whyImage} />
+          <Container className="relative z-10">
             <div className="mx-auto max-w-3xl">
               <SectionTitle
                 title="Por qué ISL"
                 subtitle="NUESTRO DIFERENCIAL"
-                className="mb-16 text-center"
+                accentWord="ISL"
+                className="mb-16 text-center [&_h2]:text-isl-white [&_p]:text-isl-gold"
               />
               <div className="space-y-8 text-center">
                 {POR_QUE_ISL.map((item, index) => (
                   <div key={index} className="space-y-3">
-                    <h3 className="font-serif text-2xl text-isl-black">{item.titulo}</h3>
-                    <p className="text-sm leading-relaxed text-isl-black/70">{item.texto}</p>
+                    <h3 className="font-serif text-2xl text-isl-white">{item.titulo}</h3>
+                    <p className="text-sm leading-relaxed text-isl-white/80">{item.texto}</p>
                   </div>
                 ))}
               </div>
@@ -165,13 +176,14 @@ export default async function Home() {
         </section>
 
         {/* CTA Vender */}
-        <section className="isl-section">
+        <section className="isl-section bg-[#F3F0EA]">
           <Container>
             <div className="mx-auto max-w-2xl text-center">
               <SectionTitle
-                title="¿Quieres vender?"
-                subtitle="CONVERSEMOS"
-                className="mb-12"
+                title="Conversemos"
+                subtitle="¿QUIERES VENDER?"
+                accentWord="Conversemos"
+                className="mb-12 [&_p]:text-isl-gold"
               />
               <LeadForm tipo="vender" submitLabel="Quiero vender mi propiedad" />
             </div>
@@ -179,17 +191,19 @@ export default async function Home() {
         </section>
 
         {/* Guía */}
-        <section className="isl-section bg-isl-offwhite">
-          <Container>
+        <section className="isl-section relative isolate overflow-hidden bg-isl-black text-isl-white">
+          <EditorialBackdrop imageUrl={insightsImage} />
+          <Container className="relative z-10">
             <SectionTitle
               title="Guía ISL"
               subtitle="INSIGHTS DEL MERCADO"
-              className="mb-12"
+              className="mb-12 [&_h2]:text-isl-white [&_p]:text-isl-gold"
             />
             {guia.length === 0 ? (
               <EmptyState
                 title="Aún no hay artículos publicados"
                 description="Estamos preparando contenido exclusivo sobre el mercado inmobiliario en Viña del Mar."
+                dark
               />
             ) : (
               <div className="grid gap-8 sm:grid-cols-2 lg:grid-cols-3">
@@ -216,13 +230,13 @@ export default async function Home() {
         )}
 
         {/* Newsletter */}
-        <section className="isl-section bg-isl-offwhite">
+        <section className="isl-section bg-[#F3F0EA]">
           <Container>
             <div className="mx-auto max-w-md">
               <SectionTitle
                 title="Newsletter"
                 subtitle="ENTÉRATE DE LAS NOVEDADES"
-                className="mb-12 text-center"
+                className="mb-12 text-center [&_p]:text-isl-gold"
               />
               <LeadForm tipo="newsletter" />
             </div>
@@ -233,5 +247,14 @@ export default async function Home() {
       <CompareBar />
       <SiteFooter email={settings?.email_general} whatsapp={settings?.whatsapp_general} logo={settings?.logo} />
     </>
+  );
+}
+
+function EditorialBackdrop({ imageUrl }: { imageUrl?: string }) {
+  return (
+    <div className="pointer-events-none absolute inset-0 z-0 overflow-hidden" aria-hidden="true">
+      {imageUrl ? <img src={imageUrl} alt="" className="size-full object-cover" /> : null}
+      <div className="absolute inset-0 bg-gradient-to-b from-black/45 via-black/40 to-black/55" />
+    </div>
   );
 }

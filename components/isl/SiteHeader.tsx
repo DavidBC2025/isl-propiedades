@@ -20,15 +20,15 @@ export function SiteHeader({ variant = "solid", whatsapp, logo }: SiteHeaderProp
             <img
               src={logo}
               alt="ISL Propiedades"
-              className="h-10 w-auto max-w-[220px] bg-transparent object-contain transition-opacity duration-200 hover:opacity-90"
+              className="h-20 w-auto max-w-[calc(100vw-10rem)] bg-transparent object-contain transition-opacity duration-200 hover:opacity-90 md:max-w-[440px]"
             />
           ) : (
-            <span className="font-serif text-2xl tracking-wide">ISL</span>
+            <span className="font-serif text-4xl tracking-wide">ISL</span>
           )}
         </Link>
         <nav className="hidden items-center gap-6 text-xs font-medium uppercase tracking-[0.12em] lg:flex" aria-label="Principal">
           {NAV_LINKS.map((link) => (
-            <Link key={link.href} href={link.href} className="min-h-11 inline-flex items-center">
+            <Link key={link.href} href={link.href} className="relative inline-flex min-h-11 items-center after:absolute after:inset-x-0 after:bottom-2 after:h-px after:origin-left after:scale-x-0 after:bg-isl-gold after:transition-transform after:duration-300 hover:after:scale-x-100">
               {link.label}
             </Link>
           ))}
@@ -50,7 +50,7 @@ export function SiteHeader({ variant = "solid", whatsapp, logo }: SiteHeaderProp
             </summary>
             <div className="absolute right-0 mt-2 w-56 rounded-sm bg-isl-white p-3 text-isl-black shadow-lg">
               {NAV_LINKS.map((link) => (
-                <Link key={link.href} href={link.href} className="flex min-h-11 items-center px-2 text-sm">
+                <Link key={link.href} href={link.href} className="flex min-h-11 items-center px-2 text-sm transition-colors duration-200 hover:text-isl-gold">
                   {link.label}
                 </Link>
               ))}

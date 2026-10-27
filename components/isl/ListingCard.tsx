@@ -24,6 +24,7 @@ export function ListingCard({ propiedad, className, enableCompare = false }: Lis
   const images = Array.isArray(propiedad.imagenes) ? propiedad.imagenes : [];
   const portada = images.find((image) => image.portada) ?? images[0];
   const dimensions = propiedad.m2_construidos ?? propiedad.m2_terreno;
+  const constructedArea = propiedad.m2_construidos;
   const status = statusLabel(propiedad.estado);
 
   return (
@@ -38,14 +39,22 @@ export function ListingCard({ propiedad, className, enableCompare = false }: Lis
               <span className="font-serif text-3xl text-isl-black/45">ISL</span>
             </div>
           )}
-          <div className="absolute inset-0 bg-isl-black/0 transition duration-300 motion-safe:group-hover:bg-isl-black/45" aria-hidden="true" />
+          <div className="absolute inset-0 bg-isl-black/0 transition duration-500 motion-safe:group-hover:bg-isl-black/70 motion-safe:group-focus-within:bg-isl-black/70" aria-hidden="true" />
           <div className="absolute left-3 top-3 flex gap-2">
             <span className="rounded-sm bg-isl-white/95 px-2.5 py-1 text-[10px] font-medium uppercase tracking-[0.12em] text-isl-black">{operationLabel(propiedad.operacion)}</span>
             {status ? <span className="rounded-sm bg-isl-gold px-2.5 py-1 text-[10px] font-medium uppercase tracking-[0.12em] text-isl-black">{status}</span> : null}
           </div>
-          <div className="absolute inset-x-0 bottom-0 translate-y-2 p-5 opacity-0 transition duration-300 motion-safe:group-hover:translate-y-0 motion-safe:group-hover:opacity-100">
-            <PriceTag value={propiedad.precio_uf} dark />
-            <p className="mt-2 text-sm text-isl-white">{formatComuna(propiedad.comuna)}</p>
+          <div className="absolute inset-x-0 bottom-0 translate-y-3 p-5 opacity-0 transition duration-500 motion-safe:group-hover:translate-y-0 motion-safe:group-hover:opacity-100 motion-safe:group-focus-within:translate-y-0 motion-safe:group-focus-within:opacity-100">
+            <p className="mb-2 text-xs font-medium uppercase tracking-[0.16em] text-isl-white/75">{formatComuna(propiedad.comuna)}</p>
+            <h3 className="font-serif text-2xl leading-tight text-isl-white">{propiedad.titulo}</h3>
+            <PriceTag value={propiedad.precio_uf} dark className="mt-3 block" />
+            <p className="mt-2 text-sm text-isl-white/90">
+              {[
+                propiedad.dormitorios ? `${propiedad.dormitorios} Dorms` : null,
+                propiedad.banos ? `${propiedad.banos} Baños` : null,
+                constructedArea != null ? `${new Intl.NumberFormat("es-CL").format(constructedArea)} m² construidos` : null,
+              ].filter(Boolean).join(" · ") || "Detalles próximamente"}
+            </p>
           </div>
         </div>
         <div className="space-y-3 p-5">
