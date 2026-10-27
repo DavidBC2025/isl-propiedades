@@ -33,13 +33,13 @@ export function ListingCard({ propiedad, className, enableCompare = false }: Lis
       <article className="overflow-hidden rounded-sm bg-isl-offwhite">
         <div className="relative aspect-[4/5] overflow-hidden bg-isl-champagne/40">
           {portada?.url ? (
-            <img src={portada.url} alt={portada.alt || propiedad.titulo} className="size-full object-cover transition duration-500 motion-safe:group-hover:scale-[1.03]" />
+            <img src={portada.url} alt={portada.alt || propiedad.titulo} className="size-full object-cover transition-[filter,transform] duration-700 ease-out motion-safe:group-hover:scale-[1.03] motion-safe:group-hover:brightness-110 motion-safe:group-focus-within:brightness-110" />
           ) : (
             <div className="flex size-full items-end bg-[linear-gradient(145deg,#E8DCC8,#F7F7F5)] p-5" aria-label="Propiedad sin fotografía">
               <span className="font-serif text-3xl text-isl-black/45">ISL</span>
             </div>
           )}
-          <div className="absolute inset-0 bg-isl-black/0 transition duration-500 motion-safe:group-hover:bg-isl-black/70 motion-safe:group-focus-within:bg-isl-black/70" aria-hidden="true" />
+          <div className="absolute inset-0 bg-isl-black/0 transition-colors duration-500 ease-out motion-safe:group-hover:bg-isl-black/45 motion-safe:group-focus-within:bg-isl-black/45" aria-hidden="true" />
           <div className="absolute left-3 top-3 flex gap-2">
             <span className="rounded-sm bg-isl-white/95 px-2.5 py-1 text-[10px] font-medium uppercase tracking-[0.12em] text-isl-black">{operationLabel(propiedad.operacion)}</span>
             {status ? <span className="rounded-sm bg-isl-gold px-2.5 py-1 text-[10px] font-medium uppercase tracking-[0.12em] text-isl-black">{status}</span> : null}

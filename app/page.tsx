@@ -15,11 +15,11 @@ import { ButtonISL } from "@/components/isl/ButtonISL";
 import { getAgentesActivos } from "@/lib/agentes";
 import { getArticulosPublicados } from "@/lib/articulos";
 import { buildHomeHeroSlides, POR_QUE_ISL } from "@/lib/home";
-import { getHeroSlides } from "@/lib/hero";
 import { getPropiedadPrincipal, getPropiedadesPublicadas } from "@/lib/propiedades";
 import { getSiteSettings } from "@/lib/settings";
 import { HOME_DESCRIPTION_FALLBACK } from "@/lib/site";
 import { getTestimoniosPublicados } from "@/lib/testimonios";
+import type { Propiedad, SiteSettings } from "@/types/isl";
 
 export const revalidate = 120;
 
@@ -36,19 +36,19 @@ export async function generateMetadata(): Promise<Metadata> {
 }
 
 export default async function Home() {
-  const [settings, heroSlides, propiedadPrincipal, propiedades, articulos, testimonios, agentes] = await Promise.all([
+  const [settings, propiedadPrincipal, propiedades, articulos, testimonios, agentes] = await Promise.all([
     getSiteSettings(),
-    getHeroSlides(),
     getPropiedadPrincipal(),
-    getPropiedadesPublicadas({ limit: 6 }),
+    getAllPublishedProperties(),
     getArticulosPublicados(),
     getTestimoniosPublicados(),
     getAgentesActivos(),
   ]);
 
-  const slides = buildHomeHeroSlides(heroSlides, propiedadPrincipal, settings);
   const seleccion = propiedades.slice(0, 6);
   const guia = articulos.slice(0, 3);
+  const { slides, coverCount } = buildPropertyPhotoSlides([propiedadPrincipal, ...propiedades], settings);
+
   const propertyImages = seleccion.flatMap((propiedad) => (
     Array.isArray(propiedad.imagenes) ? propiedad.imagenes : []
   ));
@@ -62,7 +62,7 @@ export default async function Home() {
 
       <main>
         {/* Hero */}
-        <HomeHero slides={slides} />
+        <HomeHero slides={slides} coverCount={coverCount} />
 
         {/* Selección */}
         <section className="isl-section bg-[#F3F0EA]">
@@ -248,6 +248,70 @@ export default async function Home() {
       <SiteFooter email={settings?.email_general} whatsapp={settings?.whatsapp_general} logo={settings?.logo} />
     </>
   );
+}
+
+function isStaticPropertyPhoto(imageUrl: string): boolean {
+  const path = imageUrl.split(/[?#]/, 1)[0] ?? "";
+  return /\.(?:jpe?g|png|webp)$/i.test(path);
+}
+
+async function getAllPublishedProperties(): Promise<Propiedad[]> {
+  const pageSize = 1000;
+  const properties: Propiedad[] = [];
+  let page = 1;
+  let currentPage: Propiedad[];
+
+  do {
+    currentPage = await getPropiedadesPublicadas({ pageSize, page });
+    properties.push(...currentPage);
+    page += 1;
+  } while (currentPage.length === pageSize);
+
+  return properties;
+}
+
+function buildPropertyPhotoSlides(
+  properties: (Propiedad | null)[],
+  settings: SiteSettings | null,
+) {
+  const uniqueProperties = [...new Map(
+    properties.flatMap((property) => property ? [[property.id, property] as const] : []),
+  ).values()];
+  const seenImageUrls = new Set<string>();
+  const covers: { property: Propiedad; imageUrl: string }[] = [];
+  const gallery: { property: Propiedad; imageUrl: string }[] = [];
+
+  for (const property of uniqueProperties) {
+    const images = Array.isArray(property.imagenes)
+      ? property.imagenes.filter((image) => isStaticPropertyPhoto(image.url))
+      : [];
+    const cover = images.find((image) => image.portada) ?? images[0];
+
+    if (cover && !seenImageUrls.has(cover.url)) {
+      seenImageUrls.add(cover.url);
+      covers.push({ property, imageUrl: cover.url });
+    }
+
+    for (const image of images) {
+      if (seenImageUrls.has(image.url)) continue;
+      seenImageUrls.add(image.url);
+      gallery.push({ property, imageUrl: image.url });
+    }
+  }
+
+  for (let index = gallery.length - 1; index > 0; index -= 1) {
+    const randomIndex = Math.floor(Math.random() * (index + 1));
+    [gallery[index], gallery[randomIndex]] = [gallery[randomIndex], gallery[index]];
+  }
+
+  const slides = [...covers, ...gallery].flatMap(({ property, imageUrl }, index) => {
+    const slide = buildHomeHeroSlides([], property, settings)[0];
+    return slide
+      ? [{ ...slide, id: `${property.id}-${index}`, imageUrl, videoUrl: undefined }]
+      : [];
+  });
+
+  return { slides, coverCount: covers.length };
 }
 
 function EditorialBackdrop({ imageUrl }: { imageUrl?: string }) {

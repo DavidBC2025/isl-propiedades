@@ -11,34 +11,53 @@ export type { HomeHeroSlide };
 
 type HomeHeroProps = {
   slides: HomeHeroSlide[];
+  coverCount: number;
 };
 
-export function HomeHero({ slides }: HomeHeroProps) {
+export function HomeHero({ slides, coverCount }: HomeHeroProps) {
   const reducedMotion = usePrefersReducedMotion();
   const [index, setIndex] = useState(0);
   const [previousImageUrl, setPreviousImageUrl] = useState<string | undefined>();
+  const indexRef = useRef(0);
   const transitionTimer = useRef<number | null>(null);
-  const canRotate = !reducedMotion && slides.length > 1;
+  const canRotate = slides.length > 1;
   const current = slides[Math.min(index, slides.length - 1)] ?? slides[0];
 
   const transitionTo = useCallback((nextIndex: number) => {
-    if (nextIndex === index) return;
-    setPreviousImageUrl(slides[index]?.imageUrl);
+    const currentIndex = indexRef.current;
+    if (nextIndex === currentIndex) return;
+    setPreviousImageUrl(reducedMotion ? undefined : slides[currentIndex]?.imageUrl);
+    indexRef.current = nextIndex;
     setIndex(nextIndex);
+    if (reducedMotion) return;
     if (transitionTimer.current !== null) window.clearTimeout(transitionTimer.current);
     transitionTimer.current = window.setTimeout(() => {
       setPreviousImageUrl(undefined);
       transitionTimer.current = null;
     }, 1000);
-  }, [index, slides]);
+  }, [reducedMotion, slides]);
 
   useEffect(() => {
     if (!canRotate) return;
     const timer = window.setInterval(() => {
-      transitionTo((index + 1) % slides.length);
+      const currentIndex = indexRef.current;
+      const coverIndexes = Array.from(
+        { length: Math.min(coverCount, slides.length) },
+        (_, slideIndex) => slideIndex,
+      ).filter((slideIndex) => slideIndex !== currentIndex);
+      const galleryIndexes = Array.from(
+        { length: Math.max(0, slides.length - coverCount) },
+        (_, slideIndex) => slideIndex + coverCount,
+      ).filter((slideIndex) => slideIndex !== currentIndex);
+      const preferredIndexes = Math.random() < 0.75 ? coverIndexes : galleryIndexes;
+      const candidates = preferredIndexes.length > 0
+        ? preferredIndexes
+        : [...coverIndexes, ...galleryIndexes];
+      const nextIndex = candidates[Math.floor(Math.random() * candidates.length)];
+      if (nextIndex !== undefined) transitionTo(nextIndex);
     }, 5000);
     return () => window.clearInterval(timer);
-  }, [canRotate, index, slides.length, transitionTo]);
+  }, [canRotate, coverCount, slides.length, transitionTo]);
 
   useEffect(() => () => {
     if (transitionTimer.current !== null) window.clearTimeout(transitionTimer.current);
@@ -51,8 +70,6 @@ export function HomeHero({ slides }: HomeHeroProps) {
       <HeroMedia
         key={current.id}
         imageUrl={current.imageUrl}
-        videoUrl={current.videoUrl}
-        autoPlayVideo={!reducedMotion}
         previousImageUrl={previousImageUrl}
       >
         <Container className="flex w-full flex-col justify-end pb-16 pt-28 md:pb-24">
